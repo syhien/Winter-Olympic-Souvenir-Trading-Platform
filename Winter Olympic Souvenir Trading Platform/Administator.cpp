@@ -1,5 +1,5 @@
 #include "Administator.h"
-#include <iostream>
+#include "terminal.h"
 using namespace std;
 
 Administator::Administator(Database& database)

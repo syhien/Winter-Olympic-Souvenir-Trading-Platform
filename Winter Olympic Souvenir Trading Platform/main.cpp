@@ -3,6 +3,7 @@
 #include "main.h"
 #include "Administator.h"
 #include "Database.h"
+#include "terminal.h"
 using namespace std;
 
 Database database;
