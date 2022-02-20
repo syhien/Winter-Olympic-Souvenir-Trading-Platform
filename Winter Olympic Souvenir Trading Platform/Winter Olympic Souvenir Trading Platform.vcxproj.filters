@@ -41,5 +41,25 @@
     <ClInclude Include="terminal.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="commodity.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="order.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="user.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="commodity.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="order.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="user.txt">
+      <Filter>资源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

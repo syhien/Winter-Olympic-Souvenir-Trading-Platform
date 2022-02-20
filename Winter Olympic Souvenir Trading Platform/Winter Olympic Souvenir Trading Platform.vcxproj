@@ -146,9 +146,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Administator.h" />
+    <ClInclude Include="commodity.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="order.h" />
     <ClInclude Include="terminal.h" />
+    <ClInclude Include="user.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="commodity.txt" />
+    <Text Include="order.txt" />
+    <Text Include="user.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

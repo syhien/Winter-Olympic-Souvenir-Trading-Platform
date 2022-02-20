@@ -10,6 +10,7 @@ Database database;
 Administator administator(database);
 
 int main(int argc, char* args[]) {
+	
 	while (WelcomePage());
 
 	cout << "ÍË³ö³ÌĞò\n";
