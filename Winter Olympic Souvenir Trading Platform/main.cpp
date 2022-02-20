@@ -1,7 +1,12 @@
 #include <iostream>
 #include <string>
 #include "main.h"
+#include "Administator.h"
+#include "Database.h"
 using namespace std;
+
+Database database;
+Administator administator(database);
 
 int main(int argc, char* args[]) {
 	while (WelcomePage());
@@ -40,5 +45,21 @@ bool WelcomePage() {
 
 void AdministatorPage()
 {
-	cout << "todo\n";
+	string name, password;
+	cout << "输入管理员账户名：";
+	cin >> name;
+	cout << "输入管理员密码：";
+	cin >> password;
+	while (administator.login(name, password) == false)
+	{
+		cout << "管理员账号或密码错误\n是否再次尝试？\n输入1重试，输入其他任意数字放弃重试\n";
+		if (getOperationCode() != 1)
+			return;
+		cout << "输入管理员账户名：";
+		cin >> name;
+		cout << "输入管理员密码：";
+		cin >> password;
+	}
+	cout << "登录成功！\n";
+	administator.HomePage();
 }
