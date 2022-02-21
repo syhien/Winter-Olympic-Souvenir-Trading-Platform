@@ -4,13 +4,23 @@
 #include "Administator.h"
 #include "Database.h"
 #include "terminal.h"
+#include <codecvt>
+#include <locale>
 using namespace std;
 
 Database database;
 Administator administator(database);
 
 int main(int argc, char* args[]) {
-	
+	setlocale(LC_ALL, "chs");
+	wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	wcout.imbue(locale("chs"));
+	auto result = database.doCommand("SELECT * FROM user");
+	for (auto& i : result) {
+		for (auto& j : i) {
+			std::wcout << L"key=" + converter.from_bytes(j.first) + L", value=" + converter.from_bytes(j.second) << std::endl;
+		}
+	}
 	while (WelcomePage());
 
 	cout << "ÍË³ö³ÌÐò\n";
@@ -32,13 +42,16 @@ bool WelcomePage() {
 	{
 	case 1:
 		//
+		break;
 	case 2:
 		//
+		break;
 	case 3:
 		cout << "ÍË³ö»¶Ó­Ò³\n";
 		return false;
 	case 4:
 		AdministatorPage();
+		break;
 	default:
 		break;
 	}
