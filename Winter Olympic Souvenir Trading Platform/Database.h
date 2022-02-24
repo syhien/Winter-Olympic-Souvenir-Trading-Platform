@@ -10,11 +10,11 @@ class Database
 {
 public:
 	Database();
-	std::vector< std::map<std::string, std::string> > doCommand(std::string command);
+	std::vector< std::map<std::string, std::string> > perform(std::string command);
 private:
 	std::vector<Commodity> __commodity;
 	std::vector<Order> __order;
 	std::vector<User> __user;
-	std::map<std::string, int> __columnNumberOfTable;
+	std::map<std::string, std::vector<std::string> > __columnOfTable;
 };
 

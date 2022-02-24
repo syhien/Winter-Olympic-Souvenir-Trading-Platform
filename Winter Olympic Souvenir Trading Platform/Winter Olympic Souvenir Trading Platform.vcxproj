@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Administator.cpp" />
+    <ClCompile Include="Calculator.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="terminal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Administator.h" />
+    <ClInclude Include="Calculator.h" />
     <ClInclude Include="commodity.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="main.h" />

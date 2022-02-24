@@ -15,7 +15,7 @@ int main(int argc, char* args[]) {
 	setlocale(LC_ALL, "chs");
 	wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	wcout.imbue(locale("chs"));
-	auto result = database.doCommand("SELECT * FROM user");
+	auto result = database.perform("SELECT * FROM user");
 	for (auto& i : result) {
 		for (auto& j : i) {
 			std::wcout << L"key=" + converter.from_bytes(j.first) + L", value=" + converter.from_bytes(j.second) << std::endl;
@@ -29,6 +29,7 @@ int main(int argc, char* args[]) {
 
 bool WelcomePage() {
 	int operationCode;
+	User user;
 	cout << "1.用户登录  2.用户注册  3.退出程序  4.管理员登录\n";
 	while (true)
 	{

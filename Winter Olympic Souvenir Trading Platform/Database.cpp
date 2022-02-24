@@ -17,7 +17,7 @@ using namespace std;
 Database::Database()
 {
 	setlocale(LC_ALL, "chs");
-	__columnNumberOfTable["commodity"] = 8;
+	__columnOfTable["commodity"] = { "itemID", "name","price","count","description", "sellerID", "time", "state" };
 	__commodity.clear();
 	ifstream fin("commodity.txt", ios::in);
 	if (fin) {
@@ -45,7 +45,7 @@ Database::Database()
 	fin.clear();
 
 	__order.clear();
-	__columnNumberOfTable["order"] = 7;
+	__columnOfTable["order"] = { "orderID","itemID","price","count", "time", "sellerID", "buyerID" };
 	fin.open("order.txt", ios::in);
 	if (fin) {
 		string tmp, tmp1;
@@ -71,7 +71,7 @@ Database::Database()
 	fin.clear();
 
 	__user.clear();
-	__columnNumberOfTable["user"] = 7;
+	__columnOfTable["user"] = { "userID", "name","password","contact","address","wallet","state" };
 	fin.open("user.txt", ios::in);
 	if (fin) {
 		string tmp, tmp1;
@@ -96,7 +96,7 @@ Database::Database()
 	fin.clear();
 }
 
-std::vector<std::map<std::string, std::string>> Database::doCommand(std::string command)
+std::vector<std::map<std::string, std::string>> Database::perform(std::string command)
 {
 	istringstream stream(command);
 	string instructionName;
@@ -129,7 +129,7 @@ std::vector<std::map<std::string, std::string>> Database::doCommand(std::string 
 		{
 			newLine.push_back(tmpValue);
 		}
-		if (newLine.size() != __columnNumberOfTable[tableName]) {
+		if (newLine.size() != __columnOfTable[tableName].size()) {
 			throw "Less or too many values.";
 		}
 		if (tableName == "commodity") {
@@ -286,6 +286,27 @@ std::vector<std::map<std::string, std::string>> Database::doCommand(std::string 
 					ret.push_back(line);
 				}
 				return ret;
+			}
+			else {
+				throw "No selected table named " + tableName;
+			}
+		}
+		else {
+			string column;
+			stream >> column;
+			if (tableName == "commodity") {
+
+			}
+			else if (tableName == "order") {
+
+			}
+			else if (tableName == "user") {
+				if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), column) == __columnOfTable[tableName].end()) {
+					throw "No selected colomn named" + column;
+				}
+				auto columnIt = find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), column);
+				int columnPosition = distance(__columnOfTable[tableName].begin(), columnIt);
+				
 			}
 			else {
 				throw "No selected table named " + tableName;
