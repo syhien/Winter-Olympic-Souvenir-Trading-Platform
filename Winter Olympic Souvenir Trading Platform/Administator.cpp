@@ -2,7 +2,7 @@
 #include "terminal.h"
 using namespace std;
 
-Administator::Administator(Database& database)
+Administator::Administator(Database* database)
 {
 	__database = database;
 }
