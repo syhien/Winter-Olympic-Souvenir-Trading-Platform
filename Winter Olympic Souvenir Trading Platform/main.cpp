@@ -12,8 +12,9 @@ Database database;
 
 int main(int argc, char* args[]) {
 	setlocale(LC_ALL, "chs");
-	wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	wcout.imbue(locale("chs"));
+
+	auto testDB = database.perform("SELECT * FROM commodity WHERE state CONTAINS ЯњЪлжа");
 
 	Administator administator(&database);
 

@@ -13,6 +13,7 @@
 #include <ctime>
 #include <ranges>
 #include <Windows.h>
+#pragma warning(disable:4996)
 using namespace std;
 
 wstring string2wstring(string str)
@@ -38,17 +39,18 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		auto tablePath = i.second;
 		try
 		{
-			ifstream fin(tablePath, ios::in);
+			wifstream fin(tablePath, ios::in);
+			fin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 			if (!fin)
 				throw "No selected file called " + tablePath;
-			string line;
+			wstring line;
 			getline(fin, line);
 			while (getline(fin, line)) {
-				istringstream lineStream(line);
-				string tmpValue;
+				wistringstream lineStream(line);
+				wstring tmpValue;
 				int count = 0;
-				std::vector<std::pair<std::string, std::string> > newLine;
-				while (getline(lineStream, tmpValue, ',')) {
+				std::vector<std::pair<std::string, std::wstring> > newLine;
+				while (getline(lineStream, tmpValue, L',')) {
 					newLine.push_back({ __columnOfTable[tableName][count],tmpValue });
 					count++;
 				}
@@ -58,12 +60,12 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		}
 		catch (const std::exception&)
 		{
-			__table[tableName] = std::vector<std::vector<std::pair<std::string, std::string> > >();
+			__table[tableName] = std::vector<std::vector<std::pair<std::string, std::wstring> > >();
 		}
 	}
 }
 
-std::vector<std::vector<std::pair<std::string, std::string> > > Database::perform(std::string command)
+std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::perform(std::string command)
 {
 	istringstream commandStream(command);
 	string instruction;
@@ -80,10 +82,10 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::perfor
 	else {
 		throw "No selected command called " + instruction;
 	}
-	return std::vector<std::vector<std::pair<std::string, std::string> > >();
+	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
 }
 
-std::vector<std::vector<std::pair<std::string, std::string> > > Database::__select(std::istringstream& stream)
+std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__select(std::istringstream& stream)
 {
 	string assertString;
 	stream >> assertString;
@@ -115,10 +117,10 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 		if ((stream >> assertString) and !assertString.empty()) {
 			throw "Wrong command format.";
 		}
-		std::vector<std::vector<std::pair<std::string, std::string> > > result;
-		for (auto& i : __table[tableName]) {
-			for (auto& j : i | views::filter([column](const pair<string, string> k) {return k.first == column; })) {
-				if (string2wstring(j.second).find(string2wstring(value)) != wstring::npos)
+		std::vector<std::vector<std::pair<std::string, std::wstring> > > result;
+		for (auto i : __table[tableName]) {
+			for (auto j : i | views::filter([column](pair<string, wstring> k) {return k.first == column; })) {
+				if (j.second.find(string2wstring(value)) != wstring::npos)
 					result.push_back(i);
 			}
 		}
@@ -127,5 +129,15 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 	else {
 		throw "Wrong command format.";
 	}
-	return std::vector<std::vector<std::pair<std::string, std::string> > >();
+	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
+}
+
+std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__insert(std::istringstream& stream)
+{
+	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+}
+
+std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__update(std::istringstream& stream)
+{
+	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 }
