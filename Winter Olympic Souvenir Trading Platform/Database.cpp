@@ -98,7 +98,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 	}
 	string tableName;
 	stream >> tableName;
-	if (__table.find(tableName) == __table.end()) {
+	if (!__table.contains(tableName)) {
 		throw "No selected table named " + tableName;
 	}
 	if (!(stream >> assertString) or assertString.empty()) {
@@ -134,6 +134,42 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 
 std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__insert(std::istringstream& stream)
 {
+	string assertString;
+	stream >> assertString;
+	if (assertString != "INTO") {
+		throw "Wrong command format.";
+	}
+	string tableName;
+	stream >> tableName;
+	if (!__table.contains(tableName)) {
+		throw "No selected table named " + tableName;
+	}
+	stream >> assertString;
+	if (assertString != "VALUES") {
+		throw "Wrong command format.";
+	}
+	char assertChar;
+	stream >> assertChar;
+	if (assertChar != '(') {
+		throw "Wrong command format.";
+	}
+	string line;
+	stream >> line;
+	if (line.back() != ')') {
+		throw "Wrong command format.";
+	}
+	line.pop_back();
+	istringstream lineStream(line);
+	std::vector<std::pair<std::string, std::wstring>> newLine;
+	for (auto& i : __columnOfTable[tableName]) {
+		string newValue;
+		getline(lineStream, newValue, ',');
+		if (newValue.empty()) {
+			throw "Wrong command format.";
+		}
+		newLine.push_back({ i,string2wstring(newValue) });
+	}
+	__table[tableName].push_back(newLine);
 	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 }
 
