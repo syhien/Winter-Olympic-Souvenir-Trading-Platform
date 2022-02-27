@@ -42,7 +42,7 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 			wifstream fin(tablePath, ios::in);
 			fin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 			if (!fin)
-				throw "No selected file called " + tablePath;
+				throw exception("No selected file.");
 			wstring line;
 			getline(fin, line);
 			while (getline(fin, line)) {
@@ -80,7 +80,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::perfo
 		return __update(commandStream);
 	}
 	else {
-		throw "No selected command called " + instruction;
+		throw exception("No selected command.");
 	}
 	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
 }
@@ -90,16 +90,16 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 	string assertString;
 	stream >> assertString;
 	if (assertString != "*") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	stream >> assertString;
 	if (assertString != "FROM") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw "No selected table named " + tableName;
+		throw exception("No selected table.");
 	}
 	if (!(stream >> assertString) or assertString.empty()) {
 		// select ALL
@@ -110,12 +110,12 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 		stream >> column;
 		stream >> assertString;
 		if (assertString != "CONTAINS") {
-			throw "Wrong command format.";
+			throw exception("Wrong command format.");
 		}
 		string value;
 		stream >> value;
 		if ((stream >> assertString) and !assertString.empty()) {
-			throw "Wrong command format.";
+			throw exception("Wrong command format.");
 		}
 		std::vector<std::vector<std::pair<std::string, std::wstring> > > result;
 		for (auto i : __table[tableName]) {
@@ -127,7 +127,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 		return result;
 	}
 	else {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
 }
@@ -137,26 +137,26 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__inser
 	string assertString;
 	stream >> assertString;
 	if (assertString != "INTO") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw "No selected table named " + tableName;
+		throw exception("No selected table.");
 	}
 	stream >> assertString;
 	if (assertString != "VALUES") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	char assertChar;
 	stream >> assertChar;
 	if (assertChar != '(') {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	string line;
 	stream >> line;
 	if (line.back() != ')') {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	line.pop_back();
 	istringstream lineStream(line);
@@ -165,7 +165,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__inser
 		string newValue;
 		getline(lineStream, newValue, ',');
 		if (newValue.empty()) {
-			throw "Wrong command format.";
+			throw exception("Wrong command format.");
 		}
 		newLine.push_back({ i,string2wstring(newValue) });
 	}
@@ -179,11 +179,11 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw "No selected table named " + tableName;
+		throw exception("No selected table.");
 	}
 	stream >> assertString;
 	if (assertString != "SET") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	string updateColumn, updateValue;
 	map<string, wstring> updateDict;
@@ -191,30 +191,30 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 	while (stream >> updateColumn and updateColumn != "WHERE" and updateColumn != "HERE") {
 		stream >> assertChar;
 		if (assertChar != '=') {
-			throw "Wrong command format.";
+			throw exception("Wrong command format.");
 		}
 		stream >> updateValue;
 		stream >> assertChar;
 		if (assertChar != ',' and assertChar != 'W') {
-			throw "Wrong command format.";
+			throw exception("Wrong command format.");
 		}
 		if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), updateColumn) == __columnOfTable[tableName].end()) {
-			throw "No selected column named " + updateColumn;
+			throw exception("No selected column.");
 		}
 		updateDict[updateColumn] = string2wstring(updateValue);
 	}
 	if (updateColumn != "WHERE" and updateColumn != "HERE") {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	string column, value;
 	stream >> column;
 	stream >> assertChar;
 	stream >> value;
 	if (assertChar != '=') {
-		throw "Wrong command format.";
+		throw exception("Wrong command format.");
 	}
 	if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), column) == __columnOfTable[tableName].end()) {
-		throw "No selected column named " + column;
+		throw exception("No selected column.");
 	}
 	for (auto& i : __table[tableName])
 		for (auto& j : i | views::filter([column, value](pair<string, wstring> k) {return k.first == column and k.second == string2wstring(value); }))

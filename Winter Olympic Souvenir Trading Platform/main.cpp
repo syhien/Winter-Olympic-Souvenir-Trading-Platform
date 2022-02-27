@@ -6,6 +6,7 @@
 #include "terminal.h"
 #include <codecvt>
 #include <locale>
+#include "Calculator.h"
 using namespace std;
 
 Database database;
@@ -15,6 +16,7 @@ int main(int argc, char* args[]) {
 	wcout.imbue(locale("chs"));
 
 	auto testDB = database.perform("SELECT * FROM commodity WHERE state CONTAINS ЯњЪлжа");
+	cout << Calculator().perform("1++5.1.1");
 
 	Administator administator(&database);
 
