@@ -175,5 +175,51 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__inser
 
 std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__update(std::istringstream& stream)
 {
+	string assertString;
+	string tableName;
+	stream >> tableName;
+	if (!__table.contains(tableName)) {
+		throw "No selected table named " + tableName;
+	}
+	stream >> assertString;
+	if (assertString != "SET") {
+		throw "Wrong command format.";
+	}
+	string updateColumn, updateValue;
+	map<string, wstring> updateDict;
+	char assertChar;
+	while (stream >> updateColumn and updateColumn != "WHERE" and updateColumn != "HERE") {
+		stream >> assertChar;
+		if (assertChar != '=') {
+			throw "Wrong command format.";
+		}
+		stream >> updateValue;
+		stream >> assertChar;
+		if (assertChar != ',' and assertChar != 'W') {
+			throw "Wrong command format.";
+		}
+		if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), updateColumn) == __columnOfTable[tableName].end()) {
+			throw "No selected column named " + updateColumn;
+		}
+		updateDict[updateColumn] = string2wstring(updateValue);
+	}
+	if (updateColumn != "WHERE" and updateColumn != "HERE") {
+		throw "Wrong command format.";
+	}
+	string column, value;
+	stream >> column;
+	stream >> assertChar;
+	stream >> value;
+	if (assertChar != '=') {
+		throw "Wrong command format.";
+	}
+	if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), column) == __columnOfTable[tableName].end()) {
+		throw "No selected column named " + column;
+	}
+	for (auto& i : __table[tableName])
+		for (auto& j : i | views::filter([column, value](pair<string, wstring> k) {return k.first == column and k.second == string2wstring(value); }))
+			for (auto& l : i)
+				if (updateDict.contains(l.first))
+					l.second = updateDict[l.first];
 	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 }
