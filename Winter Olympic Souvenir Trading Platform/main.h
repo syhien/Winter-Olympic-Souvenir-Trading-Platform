@@ -1,5 +1,6 @@
 #pragma once
-bool WelcomePage();
-void AdministatorPage();
+#include "Administator.h"
+bool WelcomePage(Administator& administator);
+void AdministatorPage(Administator& administator);
 void SellerPage();
 void BuyerPage();
