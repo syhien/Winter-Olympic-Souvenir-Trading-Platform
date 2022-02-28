@@ -15,8 +15,10 @@ public:
 private:
 	std::map<std::string, std::vector<std::vector<std::pair<std::string, std::wstring> > > > __table;
 	std::map<std::string, std::vector<std::string> > __columnOfTable;
+	std::vector<std::pair<std::string, std::string> > __tableFiles;
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __select(std::istringstream& stream);
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __insert(std::istringstream& stream);
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __update(std::istringstream& stream);
+	void __save();
 };
 
