@@ -114,7 +114,7 @@ void Administator::handleCommodity()
 						wcout << format(L"|{:^19}", i.second);
 					wcout << "|\n";
 				}
-				cout << "请确认是否下架上述商品，输入1以下架商品，输入其他数字取消下架\n";
+				cout << "请确认是否下架商品，输入1以下架商品，输入其他数字取消下架\n";
 				tmpInt = getOperationCode();
 				if (tmpInt != 1) {
 					cout << "已取消下架" << endl;
@@ -181,4 +181,70 @@ void Administator::handleOrder()
 
 void Administator::handleUser()
 {
+	bool keepHere = true;
+	auto allUser = __database->perform("SELECT * FROM user");
+	auto selectedUser = allUser;
+	wstring keyword;
+	int tmpInt;
+	while (keepHere) {
+		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有用户", L"2.封禁用户", L"3.返回上层菜单");
+		auto operationCode = getOperationCode();
+		allUser = __database->perform("SELECT * FROM user");
+		switch (operationCode)
+		{
+		case 1:
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+			for (auto& line : allUser)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^21}", i.second);
+				wcout << "|\n";
+			}
+			break;
+		case 2:
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+			for (auto& line : allUser)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^21}", i.second);
+				wcout << "|\n";
+			}
+			cout << "请输入待封禁的用户的用户ID：";
+			wcin >> keyword;
+			try
+			{
+				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + wstring2string(keyword));
+				cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+				for (auto& line : selectedUser)
+				{
+					wcout << endl;
+					for (auto& i : line)
+						wcout << format(L"|{:^21}", i.second);
+					wcout << "|\n";
+				}
+				cout << "请确认是否封禁用户，输入1以封禁用户，输入其他数字取消封禁\n";
+				tmpInt = getOperationCode();
+				if (tmpInt != 1) {
+					cout << "已取消封禁" << endl;
+					break;
+				}
+				__database->perform("UPDATE user SET state = 封禁 WHERE userID = " + wstring2string(keyword));
+				cout << "封禁成功\n";
+			}
+			catch (const std::exception& e)
+			{
+				cout << e.what() << endl;
+				cout << "操作未生效\n";
+			}
+
+			break;
+		case 3:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
 }
