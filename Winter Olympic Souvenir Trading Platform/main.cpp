@@ -7,6 +7,7 @@
 #include <codecvt>
 #include <locale>
 #include "Calculator.h"
+#include <format>
 using namespace std;
 
 Database database;
@@ -14,9 +15,6 @@ Database database;
 int main(int argc, char* args[]) {
 	setlocale(LC_ALL, "chs");
 	wcout.imbue(locale("chs"));
-
-	auto testDB = database.perform("SELECT * FROM commodity WHERE state CONTAINS 销售中");
-	cout << Calculator().perform("1+5.11*(-1*2)/4");
 
 	Administator administator(&database);
 
@@ -29,7 +27,7 @@ int main(int argc, char* args[]) {
 bool WelcomePage(Administator& administator) {
 	int operationCode;
 	User user;
-	cout << "1.用户登录  2.用户注册  3.退出程序  4.管理员登录\n";
+	wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.用户登录", L"2.用户注册", L"3.退出程序", L"4.管理员登录");
 	while (true)
 	{
 		operationCode = getOperationCode();

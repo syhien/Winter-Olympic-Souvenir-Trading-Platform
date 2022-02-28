@@ -1,5 +1,8 @@
 #include "terminal.h"
 #include <string>
+#include <format>
+#include <vector>
+using namespace std;
 
 int getOperationCode()
 {

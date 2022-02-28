@@ -236,6 +236,7 @@ void Database::__save()
 		fout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 		if (!fout)
 			throw exception("Unable to save database.");
+		fout << tableTitle[i.first] << endl;
 		for (auto& j : __table[i.first]) {
 			for (auto& k : j) {
 				if (k.first == __columnOfTable[i.first].back())
@@ -244,5 +245,6 @@ void Database::__save()
 					fout << k.second << L",";
 			}
 		}
+		fout.close();
 	}
 }
