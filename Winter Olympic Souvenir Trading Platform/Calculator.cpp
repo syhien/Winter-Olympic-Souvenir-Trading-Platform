@@ -4,6 +4,7 @@
 #include <set>
 #include <ctype.h>
 #include <ranges>
+#include <format>
 using namespace std;
 
 
@@ -139,6 +140,42 @@ std::vector<item> Calculator::midToBack(std::vector<item>& mid)
 	return back;
 }
 
+double Calculator::calculate(std::vector<item>& back)
+{
+	stack<double> result;
+	for (auto& i : back) {
+		if (i.isOperand)
+			result.push(i.operand);
+		else {
+			double a, b;
+			b = result.top();
+			result.pop();
+			a = result.top();
+			result.pop();
+			switch (i._operator)
+			{
+			case '+':
+				result.push(a + b);
+				break;
+			case '-':
+				result.push(a - b);
+				break;
+			case '*':
+				result.push(a * b);
+				break;
+			case '/':
+				result.push(a / b);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if (result.size() > 1)
+		throw exception("Wrong format.");
+	return result.top();
+}
+
 std::string Calculator::perform(std::string input)
 {
 	try
@@ -146,6 +183,7 @@ std::string Calculator::perform(std::string input)
 		auto mid = divide(input);
 		check(mid);
 		auto back = midToBack(mid);
+		return format("{:.1f}", calculate(back));
 	}
 	catch (const std::exception& e)
 	{
