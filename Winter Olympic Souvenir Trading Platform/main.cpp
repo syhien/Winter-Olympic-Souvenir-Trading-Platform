@@ -16,7 +16,7 @@ int main(int argc, char* args[]) {
 	wcout.imbue(locale("chs"));
 
 	auto testDB = database.perform("SELECT * FROM commodity WHERE state CONTAINS ЯњЪлжа");
-	cout << Calculator().perform("1++5.1.1");
+	cout << Calculator().perform("1+5.11*(-1*2)/4");
 
 	Administator administator(&database);
 

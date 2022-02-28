@@ -78,9 +78,9 @@ void Calculator::check(std::vector<item>& mid)
 					throw exception("Missing operator.");
 			}
 			else {
-				if (i - 1 >= 0 and !mid[i - 1].isOperand)
+				if (i - 1 >= 0 and !mid[i - 1].isOperand and mid[i - 1]._operator != '(' and mid[i - 1]._operator != ')')
 					throw exception("Wrong format.");
-				if (i + 1 < mid.size() and !mid[i + 1].isOperand)
+				if (i + 1 < mid.size() and !mid[i + 1].isOperand and mid[i + 1]._operator != '(' and mid[i + 1]._operator != ')')
 					throw exception("Wrong format.");
 			}
 		}
@@ -102,14 +102,50 @@ void Calculator::check(std::vector<item>& mid)
 		throw exception("Missing paired parentheses.");
 }
 
+std::vector<item> Calculator::midToBack(std::vector<item>& mid)
+{
+	// begin with '-'
+	vector<item> newMid;
+	if (!mid.front().isOperand and mid.front()._operator == '-')
+		newMid.push_back({ true,0,' ' });
+	for (auto i = mid.begin(); i != mid.end(); i++) {
+		newMid.push_back(*i);
+		if (i->isOperand == false and i->_operator == '(' and (i + 1) != mid.end() and (i + 1)->isOperand == false and (i + 1)->_operator == '-')
+			newMid.push_back({ true,0,' ' });
+	}
+
+	map<char, int> stackPriority = { {'#',0},{'(',1},{'*',5},{'/',5},{'+',3},{'-',3},{')',6} };
+	map<char, int> comePriority = { {'#',0},{'(',6},{'*',4},{'/',4},{'+',2},{'-',2},{')',1} };
+
+	newMid.push_back({ false,0,'#' });
+	vector<item> back;
+	stack<char> operatorStack;
+	operatorStack.push('#');
+	for (auto& i : newMid) {
+		if (i.isOperand)
+			back.push_back(i);
+		else {
+			while (comePriority[i._operator] < stackPriority[operatorStack.top()]) {
+				back.push_back({ false,0,operatorStack.top() });
+				operatorStack.pop();
+			}
+			if (comePriority[i._operator] == stackPriority[operatorStack.top()]) {
+				operatorStack.pop();
+				continue;
+			}
+			operatorStack.push(i._operator);
+		}
+	}
+	return back;
+}
+
 std::string Calculator::perform(std::string input)
 {
-    const map<char, int> stackPriority = { {'#',0},{'(',1},{'*',5},{'/',5},{'+',3},{'-',3},{')',6} };
-    const map<char, int> comePriority = { {'#',0},{'(',6},{'*',4},{'/',4},{'+',2},{'-',2},{')',1} };
 	try
 	{
 		auto mid = divide(input);
 		check(mid);
+		auto back = midToBack(mid);
 	}
 	catch (const std::exception& e)
 	{
