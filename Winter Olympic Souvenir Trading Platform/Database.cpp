@@ -30,6 +30,7 @@ wstring string2wstring(string str)
 
 Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 {
+	__tableFiles = inputFiles;
 	setlocale(LC_ALL, "chs");
 	__columnOfTable["commodity"] = { "itemID", "name","price","count","description", "sellerID", "time", "state" };
 	__columnOfTable["order"] = { "orderID","itemID","price","count", "time", "sellerID", "buyerID" };
@@ -170,6 +171,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__inser
 		newLine.push_back({ i,string2wstring(newValue) });
 	}
 	__table[tableName].push_back(newLine);
+	__save();
 	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 }
 
@@ -221,5 +223,26 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 			for (auto& l : i)
 				if (updateDict.contains(l.first))
 					l.second = updateDict[l.first];
+	__save();
 	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+}
+
+void Database::__save()
+{
+	setlocale(LC_ALL, "chs");
+	map<string, wstring> tableTitle = { {"commodity",L"商品ID,名称,价格,数量,描述,卖家ID,上架时间,商品状态"},{"order",L"订单ID,商品ID,交易单价,数量,交易时间,卖家ID,买家ID"},{"user",L"用户ID,用户名,密码,联系方式,地址,钱包余额,用户状态"} };
+	for (auto& i : __tableFiles) {
+		wofstream fout(i.second, ios::out | ios::trunc);
+		fout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+		if (!fout)
+			throw exception("Unable to save database.");
+		for (auto& j : __table[i.first]) {
+			for (auto& k : j) {
+				if (k.first == __columnOfTable[i.first].back())
+					fout << k.second << endl;
+				else
+					fout << k.second << L",";
+			}
+		}
+	}
 }
