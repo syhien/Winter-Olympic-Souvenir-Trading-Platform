@@ -11,6 +11,7 @@ class Calculator
 {
 private:
 	std::vector<item> divide(std::string input);
+	void check(std::vector<item>& mid);
 public:
 	std::string perform(std::string input);
 };

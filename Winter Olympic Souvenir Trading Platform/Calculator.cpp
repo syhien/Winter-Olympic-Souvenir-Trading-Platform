@@ -54,6 +54,54 @@ std::vector<item> Calculator::divide(std::string input)
 	return mid;
 }
 
+void Calculator::check(std::vector<item>& mid)
+{
+	// test continuous correctness
+	for (int i = 0; i < mid.size(); i++) {
+		if (mid[i].isOperand) {
+			if (i - 1 >= 0 and mid[i - 1].isOperand)
+				throw exception("Continuous operands.");
+			if (i + 1 < mid.size() and mid[i + 1].isOperand)
+				throw exception("Continuous operands.");
+		}
+		else {
+			if (mid[i]._operator == '(') {
+				if (i - 1 >= 0 and mid[i - 1].isOperand)
+					throw exception("Missing operator.");
+				if (i + 1 < mid.size() and !mid[1 + 1].isOperand and mid[i + 1]._operator != '-')
+					throw exception("Missing operand.");
+			}
+			else if (mid[i]._operator == ')') {
+				if (i - 1 >= 0 and !mid[i - 1].isOperand)
+					throw exception("Missing operand.");
+				if (i + 1 < mid.size() and mid[i + 1].isOperand)
+					throw exception("Missing operator.");
+			}
+			else {
+				if (i - 1 >= 0 and !mid[i - 1].isOperand)
+					throw exception("Wrong format.");
+				if (i + 1 < mid.size() and !mid[i + 1].isOperand)
+					throw exception("Wrong format.");
+			}
+		}
+	}
+
+	// test parenthesis
+	stack<char> checkParenthesis;
+	for (auto& i : mid) {
+		if (!i.isOperand and i._operator == '(')
+			checkParenthesis.push(i._operator);
+		else if (!i.isOperand and i._operator == ')') {
+			if (checkParenthesis.empty())
+				throw exception("Missing paired parentheses.");
+			else
+				checkParenthesis.pop();
+		}
+	}
+	if (checkParenthesis.size())
+		throw exception("Missing paired parentheses.");
+}
+
 std::string Calculator::perform(std::string input)
 {
     const map<char, int> stackPriority = { {'#',0},{'(',1},{'*',5},{'/',5},{'+',3},{'-',3},{')',6} };
@@ -61,6 +109,7 @@ std::string Calculator::perform(std::string input)
 	try
 	{
 		auto mid = divide(input);
+		check(mid);
 	}
 	catch (const std::exception& e)
 	{
