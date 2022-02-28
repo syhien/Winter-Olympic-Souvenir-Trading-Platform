@@ -62,6 +62,8 @@ void Administator::handleCommodity()
 {
 	bool keepHere = true;
 	auto allCommodity = __database->perform("SELECT * FROM commodity");
+	auto selectedCommodity = allCommodity;
+	int tmpInt;
 	wstring keyword;
 	while (keepHere) {
 		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.查看所有商品", L"2.检索商品", L"3.下架商品", L"4.返回上层菜单");
@@ -70,9 +72,10 @@ void Administator::handleCommodity()
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto& line : allCommodity)
 			{
+				wcout << endl;
 				for (auto& i : line)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
@@ -81,17 +84,19 @@ void Administator::handleCommodity()
 		case 2:
 			cout << "请输入关键词：";
 			wcin >> keyword;
-			cout << format("|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
+				wcout << endl;
 				for (auto& i : line)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
 			}
 			break;
 		case 3:
-			cout << format("|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto& line : allCommodity)
 			{
+				wcout << endl;
 				for (auto& i : line)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
@@ -100,6 +105,21 @@ void Administator::handleCommodity()
 			wcin >> keyword;
 			try
 			{
+				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE itemID CONTAINS " + wstring2string(keyword));
+				cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+				for (auto& line : selectedCommodity)
+				{
+					wcout << endl;
+					for (auto& i : line)
+						wcout << format(L"|{:^19}", i.second);
+					wcout << "|\n";
+				}
+				cout << "请确认是否下架上述商品，输入1以下架商品，输入其他数字取消下架\n";
+				tmpInt = getOperationCode();
+				if (tmpInt != 1) {
+					cout << "已取消下架" << endl;
+					break;
+				}
 				__database->perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + wstring2string(keyword));
 				cout << "下架成功\n";
 			}
@@ -120,6 +140,43 @@ void Administator::handleCommodity()
 
 void Administator::handleOrder()
 {
+	bool keepHere = true;
+	auto allOrder = __database->perform("SELECT * FROM order");
+	wstring keyword;
+	while (keepHere) {
+		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有订单", L"2.检索订单", L"3.返回上层菜单");
+		auto operationCode = getOperationCode();
+		allOrder = __database->perform("SELECT * FROM order");
+		switch (operationCode)
+		{
+		case 1:
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			for (auto& line : allOrder)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^21}", i.second);
+				wcout << "|\n";
+			}
+			break;
+		case 2:
+			cout << "请输入关键词：";
+			wcin >> keyword;
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			for (auto line : allOrder | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^21}", i.second);
+				wcout << "|\n";
+			}
+			break;
+		case 3:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void Administator::handleUser()
