@@ -210,7 +210,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
 						cout << "修改用户名成功" << endl;
 					}
-					catch (const std::exception& e)
+					catch (const std::exception&)
 					{
 						cout << "操作未生效" << endl;
 					}
@@ -243,7 +243,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
 						cout << "修改密码成功" << endl;
 					}
-					catch (const std::exception& e)
+					catch (const std::exception&)
 					{
 						cout << "操作未生效" << endl;
 					}
@@ -273,7 +273,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
 						cout << "修改联系方式成功" << endl;
 					}
-					catch (const std::exception& e)
+					catch (const std::exception&)
 					{
 						cout << "操作未生效" << endl;
 					}
@@ -298,7 +298,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
 						cout << "修改地址成功" << endl;
 					}
-					catch (const std::exception& e)
+					catch (const std::exception&)
 					{
 						cout << "操作未生效" << endl;
 					}
@@ -315,6 +315,30 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 			}
 			break;
 		case 3:
+			cout << "请输入充值金额：";
+			wcin >> newValue;
+			try
+			{
+				for (auto &i:newValue)
+					if (!isdigit(i) and i != '.') {
+						throw exception();
+					}
+				if (count(newValue.begin(), newValue.end(), '.') > 1)
+					throw exception();
+				else if (count(newValue.begin(), newValue.end(), '.') == 1) {
+					if (newValue[newValue.size() - 2] != '.' or newValue[0] == '.')
+						throw exception();
+				}
+				for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring>& j) {return j.first == "wallet"; })) {
+					i.second = format(L"{:.1f}", stod(i.second) + stod(newValue));
+					newValue = i.second;
+				}
+				database.perform("UPDATE user SET wallet = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+			}
+			catch (const std::exception&)
+			{
+				cout << "金额仅支持最多含1位小数的非负数值" << endl;
+			}
 			break;
 		case 4:
 			keepHere = false;
