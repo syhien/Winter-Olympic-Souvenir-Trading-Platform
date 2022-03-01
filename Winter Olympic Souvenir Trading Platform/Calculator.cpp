@@ -164,6 +164,8 @@ double Calculator::__calculate(std::vector<item>& back)
 				result.push(a * b);
 				break;
 			case '/':
+				if (fabs(b) < 0.000001)
+					throw exception("Divide zero.");
 				result.push(a / b);
 				break;
 			default:
