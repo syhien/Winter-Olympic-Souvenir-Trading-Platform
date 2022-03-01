@@ -2,6 +2,11 @@
 #include <string>
 #include <format>
 #include <vector>
+#include <iomanip>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#pragma warning(disable:4996)
 using namespace std;
 
 int getOperationCode()
@@ -20,4 +25,14 @@ int getOperationCode()
 		codeInt = getOperationCode();
 	}
 	return codeInt;
+}
+
+std::string getCurrentTime()
+{
+	time_t t = time(nullptr);
+	std::tm tm = *localtime(&t);
+	stringstream transTime;
+	transTime << put_time(&tm, "%Y-%m-%d");
+	string time = transTime.str();
+	return time;
 }

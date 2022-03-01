@@ -35,6 +35,7 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 	__columnOfTable["commodity"] = { "itemID", "name","price","count","description", "sellerID", "time", "state" };
 	__columnOfTable["order"] = { "orderID","itemID","price","count", "time", "sellerID", "buyerID" };
 	__columnOfTable["user"] = { "userID", "name","password","contact","address","wallet","state" };
+	__columnOfTable["recharge"] = { "userID","money","date" };
 	for (auto& i : inputFiles) {
 		auto tableName = i.first;
 		auto tablePath = i.second;
@@ -235,7 +236,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 void Database::__save()
 {
 	setlocale(LC_ALL, "chs");
-	map<string, wstring> tableTitle = { {"commodity",L"商品ID,名称,价格,数量,描述,卖家ID,上架时间,商品状态"},{"order",L"订单ID,商品ID,交易单价,数量,交易时间,卖家ID,买家ID"},{"user",L"用户ID,用户名,密码,联系方式,地址,钱包余额,用户状态"} };
+	map<string, wstring> tableTitle = { {"commodity",L"商品ID,名称,价格,数量,描述,卖家ID,上架时间,商品状态"},{"order",L"订单ID,商品ID,交易单价,数量,交易时间,卖家ID,买家ID"},{"user",L"用户ID,用户名,密码,联系方式,地址,钱包余额,用户状态"},{"recharge",L"用户ID,充值金额,充值时间"} };
 	for (auto& i : __tableFiles) {
 		wofstream fout(i.second, ios::out | ios::trunc);
 		fout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));

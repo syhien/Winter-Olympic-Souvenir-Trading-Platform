@@ -155,6 +155,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 {
 	bool keepHere = true;
 	wstring newValue;
+	wstring oldValue;
 	bool editSuccess = false;
 	wstring userID;
 	for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "userID"; }))
@@ -330,10 +331,11 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						throw exception();
 				}
 				for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring>& j) {return j.first == "wallet"; })) {
-					i.second = format(L"{:.1f}", stod(i.second) + stod(newValue));
-					newValue = i.second;
+					oldValue = i.second;
+					i.second = format(L"{:.1f}", stod(oldValue) + stod(newValue));
 				}
-				database.perform("UPDATE user SET wallet = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+				database.perform("UPDATE user SET wallet = " + wstring2string(format(L"{:.1f}", stod(oldValue) + stod(newValue))) + " WHERE userID = " + wstring2string(userID));
+				database.perform("INSERT INTO recharge VALUES (" + wstring2string(userID) + "," + wstring2string(newValue) + "," + getCurrentTime() + ")");
 			}
 			catch (const std::exception&)
 			{
