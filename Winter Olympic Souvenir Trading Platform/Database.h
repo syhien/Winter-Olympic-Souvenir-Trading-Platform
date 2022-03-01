@@ -9,6 +9,7 @@ public:
 	Database(std::vector<std::pair<std::string, std::string> > inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"}
 		});
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > perform(std::string command);
+	~Database();
 private:
 	std::map<std::string, std::vector<std::vector<std::pair<std::string, std::wstring> > > > __table;
 	std::map<std::string, std::vector<std::string> > __columnOfTable;

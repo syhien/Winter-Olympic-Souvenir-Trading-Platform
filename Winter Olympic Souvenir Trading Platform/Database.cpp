@@ -86,6 +86,11 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::perfo
 	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
 }
 
+Database::~Database()
+{
+	__save();
+}
+
 std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__select(std::istringstream& stream)
 {
 	string assertString;
