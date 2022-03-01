@@ -149,12 +149,9 @@
   <ItemGroup>
     <ClInclude Include="Administator.h" />
     <ClInclude Include="Calculator.h" />
-    <ClInclude Include="commodity.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="order.h" />
     <ClInclude Include="terminal.h" />
-    <ClInclude Include="user.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="commodity.txt" />
