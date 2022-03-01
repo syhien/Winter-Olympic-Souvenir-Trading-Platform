@@ -24,13 +24,13 @@ void Administator::HomePage()
 		switch (operationCode)
 		{
 		case 1:
-			__handleCommodity();
+			__handleCommodityPage();
 			break;
 		case 2:
-			__handleOrder();
+			__handleOrderPage();
 			break;
 		case 3:
-			__handleUser();
+			__handleUserPage();
 			break;
 		case 4:
 			cout << "管理员登出\n";
@@ -58,7 +58,7 @@ string wstring2string(wstring wstr)
 	return result;
 }
 
-void Administator::__handleCommodity()
+void Administator::__handleCommodityPage()
 {
 	bool keepHere = true;
 	auto allCommodity = __database->perform("SELECT * FROM commodity");
@@ -138,7 +138,7 @@ void Administator::__handleCommodity()
 	}
 }
 
-void Administator::__handleOrder()
+void Administator::__handleOrderPage()
 {
 	bool keepHere = true;
 	auto allOrder = __database->perform("SELECT * FROM order");
@@ -179,7 +179,7 @@ void Administator::__handleOrder()
 	}
 }
 
-void Administator::__handleUser()
+void Administator::__handleUserPage()
 {
 	bool keepHere = true;
 	auto allUser = __database->perform("SELECT * FROM user");
