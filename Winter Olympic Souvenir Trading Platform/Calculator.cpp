@@ -8,7 +8,7 @@
 using namespace std;
 
 
-std::vector<item> Calculator::divide(std::string input)
+std::vector<item> Calculator::__divide(std::string input)
 {
 	vector<item> mid;
 	const set<char> legalChar = { '+','-','*','/','(',')' };
@@ -55,7 +55,7 @@ std::vector<item> Calculator::divide(std::string input)
 	return mid;
 }
 
-void Calculator::check(std::vector<item>& mid)
+void Calculator::__check(std::vector<item>& mid)
 {
 	// test continuous correctness
 	for (int i = 0; i < mid.size(); i++) {
@@ -103,7 +103,7 @@ void Calculator::check(std::vector<item>& mid)
 		throw exception("Missing paired parentheses.");
 }
 
-std::vector<item> Calculator::midToBack(std::vector<item>& mid)
+std::vector<item> Calculator::__midToBack(std::vector<item>& mid)
 {
 	// begin with '-'
 	vector<item> newMid;
@@ -140,7 +140,7 @@ std::vector<item> Calculator::midToBack(std::vector<item>& mid)
 	return back;
 }
 
-double Calculator::calculate(std::vector<item>& back)
+double Calculator::__calculate(std::vector<item>& back)
 {
 	stack<double> result;
 	for (auto& i : back) {
@@ -180,10 +180,10 @@ std::string Calculator::perform(std::string input)
 {
 	try
 	{
-		auto mid = divide(input);
-		check(mid);
-		auto back = midToBack(mid);
-		return format("{:.1f}", calculate(back));
+		auto mid = __divide(input);
+		__check(mid);
+		auto back = __midToBack(mid);
+		return format("{:.1f}", __calculate(back));
 	}
 	catch (const std::exception& e)
 	{

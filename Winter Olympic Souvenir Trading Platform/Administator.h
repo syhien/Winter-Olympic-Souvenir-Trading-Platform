@@ -11,8 +11,8 @@ private:
 	Database* __database;
 	const std::string __name = "admin";
 	const std::string __password = "123456";
-	void handleCommodity();
-	void handleOrder();
-	void handleUser();
+	void __handleCommodity();
+	void __handleOrder();
+	void __handleUser();
 };
 

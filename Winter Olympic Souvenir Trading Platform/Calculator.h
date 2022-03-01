@@ -10,10 +10,10 @@ struct item
 class Calculator
 {
 private:
-	std::vector<item> divide(std::string input);
-	void check(std::vector<item>& mid);
-	std::vector<item> midToBack(std::vector<item>& mid);
-	double calculate(std::vector<item>& back);
+	std::vector<item> __divide(std::string input);
+	void __check(std::vector<item>& mid);
+	std::vector<item> __midToBack(std::vector<item>& mid);
+	double __calculate(std::vector<item>& back);
 public:
 	std::string perform(std::string input);
 };
