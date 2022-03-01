@@ -8,6 +8,7 @@
 #include <locale>
 #include "Calculator.h"
 #include <format>
+#include <Windows.h>
 using namespace std;
 
 Database database;
@@ -26,7 +27,6 @@ int main(int argc, char* args[]) {
 
 bool WelcomePage(Administator& administator) {
 	int operationCode;
-	User user;
 	wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.用户登录", L"2.用户注册", L"3.退出程序", L"4.管理员登录");
 	while (true)
 	{
@@ -39,7 +39,7 @@ bool WelcomePage(Administator& administator) {
 	switch (operationCode)
 	{
 	case 1:
-		//
+		logIn();
 		break;
 	case 2:
 		//
@@ -75,4 +75,54 @@ void AdministatorPage(Administator& administator)
 	}
 	cout << "登录成功！\n";
 	administator.HomePage();
+}
+
+static string wstring2string(wstring wstr)
+{
+	string result;
+	//获取缓冲区大小，并申请空间，缓冲区大小事按字节计算的  
+	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
+	char* buffer = new char[len + 1];
+	//宽字节编码转换成多字节编码  
+	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
+	buffer[len] = '\0';
+	//删除缓冲区并返回值  
+	result.append(buffer);
+	delete[] buffer;
+	return result;
+}
+
+void logIn()
+{
+	bool checkName = false;
+	bool checkPassword = false;
+	vector<pair<string, wstring> > userInfo;
+	while (!checkName or !checkPassword)
+	{
+		wstring name, password;
+		cout << "请输入用户名：";
+		wcin >> name;
+		cout << "请输入密码：";
+		wcin >> password;
+		for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(name))) {
+			for (auto& j : i) {
+				if (j.first == "name" and j.second == name)
+					checkName = true;
+				if (j.first == "password" and j.second == password)
+					checkPassword = true;
+			}
+			if (checkName and checkPassword)
+				userInfo = i;
+		}
+		if (!checkName or !checkPassword) {
+			cout << "账号或密码错误\n是否再次尝试？\n输入1重试，输入其他任意数字放弃重试\n";
+			if (getOperationCode() != 1)
+				return;
+		}
+	}
+	cout << "登录成功\n";
+}
+
+void signUp()
+{
 }
