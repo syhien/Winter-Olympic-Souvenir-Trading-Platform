@@ -8,7 +8,9 @@
 #include <locale>
 #include "Calculator.h"
 #include <format>
+#include <ranges>
 #include <Windows.h>
+#include <ctype.h>
 using namespace std;
 
 Database database;
@@ -39,7 +41,7 @@ bool WelcomePage(Administator& administator) {
 	switch (operationCode)
 	{
 	case 1:
-		logIn();
+		LogIn();
 		break;
 	case 2:
 		//
@@ -92,7 +94,7 @@ static string wstring2string(wstring wstr)
 	return result;
 }
 
-void logIn()
+void LogIn()
 {
 	bool checkName = false;
 	bool checkPassword = false;
@@ -110,6 +112,10 @@ void logIn()
 					checkName = true;
 				if (j.first == "password" and j.second == password)
 					checkPassword = true;
+				if (j.first == "state" and j.second == L"封禁") {
+					cout << "用户已被封禁" << endl;
+					return;
+				}
 			}
 			if (checkName and checkPassword)
 				userInfo = i;
@@ -121,10 +127,212 @@ void logIn()
 		}
 	}
 	cout << "登录成功\n";
-
-
+	bool keepHere = true;
+	while (keepHere)
+	{
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.我是买家", L"2.我是卖家", L"3.管理个人信息", L"4.返回上层菜单");
+		switch (getOperationCode())
+		{
+		case 1:
+			BuyerPage();
+			break;
+		case 2:
+			SellerPage();
+			break;
+		case 3:
+			InfoManagePage(userInfo);
+			break;
+		case 4:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void signUp()
+void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
+{
+	bool keepHere = true;
+	wstring newValue;
+	bool editSuccess = false;
+	wstring userID;
+	for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "userID"; }))
+		userID = i.second;
+	while (keepHere)
+	{
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.查看信息", L"2.修改信息", L"3.充值", L"4.返回上层菜单");
+		switch (getOperationCode())
+		{
+		case 1:
+			wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"用户名", L"联系方式", L"地址", L"钱包余额");
+			for (auto& i : userInfo) {
+				if (i.first == "name") {
+					wcout << format(L"|{:^37}", i.second);
+				}
+				else if (i.first == "contact") {
+					wcout << format(L"|{:^37}", i.second);
+				}
+				else if (i.first == "address") {
+					wcout << format(L"|{:^37}", i.second);
+				}
+				else if (i.first == "wallet") {
+					wcout << format(L"|{:^37}", i.second);
+				}
+			}
+			wcout << "|\n";
+			break;
+		case 2:
+			cout << "请选择想要本次修改的信息" << endl;
+			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.用户名", L"2.密码", L"3.联系方式", L"4.地址", L"5.放弃本次修改");
+			switch (getOperationCode())
+			{
+			case 1:
+				editSuccess = true;
+				cout << "请输入新用户名：";
+				wcin >> newValue;
+				if (newValue.size() > 10) {
+					cout << "用户名过长" << endl;
+					break;
+				}
+				for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(newValue)))
+					for (auto& j : i)
+						if (j.first == "name" and j.second == newValue) {
+							editSuccess = false;
+							cout << "该用户名已被占用" << endl;
+							break;
+						}
+				if (editSuccess) {
+					try
+					{
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "name"; }))
+							i.second = newValue;
+						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						cout << "修改用户名成功" << endl;
+					}
+					catch (const std::exception& e)
+					{
+						cout << "操作未生效" << endl;
+					}
+				}
+				else {
+					cout << "操作未生效" << endl;
+				}
+				break;
+			case 2:
+				editSuccess = true;
+				cout << "请输入新密码：";
+				wcin >> newValue;
+				if (newValue.size() > 20) {
+					cout << "密码过长" << endl;
+					break;
+				}
+				for (auto& i : newValue) {
+					if (!isdigit(i) and !islower(i))
+					{
+						cout << "密码仅允许由小写字母和数字组成" << endl;
+						editSuccess = false;
+						break;
+					}
+				}
+				if (editSuccess) {
+					try
+					{
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "password"; }))
+							i.second = newValue;
+						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						cout << "修改密码成功" << endl;
+					}
+					catch (const std::exception& e)
+					{
+						cout << "操作未生效" << endl;
+					}
+				}
+				else {
+					cout << "操作未生效" << endl;
+				}
+				break;
+			case 3:
+				editSuccess = true;
+				cout << "请输入新联系方式：";
+				wcin >> newValue;
+				if (newValue.size() > 20) {
+					cout << "联系方式过长" << endl;
+					break;
+				}
+				for (auto& i : newValue | views::filter([](const wchar_t j) {return !isdigit(j); })) {
+					cout << "联系方式仅允许由数字组成" << endl;
+					editSuccess = false;
+					break;
+				}
+				if (editSuccess) {
+					try
+					{
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "contact"; }))
+							i.second = newValue;
+						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						cout << "修改联系方式成功" << endl;
+					}
+					catch (const std::exception& e)
+					{
+						cout << "操作未生效" << endl;
+					}
+				}
+				else {
+					cout << "操作未生效" << endl;
+				}
+				break;
+			case 4:
+				editSuccess = true;
+				cout << "请输入新地址：";
+				wcin >> newValue;
+				if (newValue.size() > 40) {
+					cout << "地址过长" << endl;
+					break;
+				}
+				if (editSuccess) {
+					try
+					{
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "address"; }))
+							i.second = newValue;
+						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						cout << "修改地址成功" << endl;
+					}
+					catch (const std::exception& e)
+					{
+						cout << "操作未生效" << endl;
+					}
+				}
+				else {
+					cout << "操作未生效" << endl;
+				}
+				break;
+			case 5:
+				cout << "放弃修改" << endl;
+				break;
+			default:
+				break;
+			}
+			break;
+		case 3:
+			break;
+		case 4:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void SellerPage()
+{
+}
+
+void BuyerPage()
+{
+}
+
+void SignUp()
 {
 }
