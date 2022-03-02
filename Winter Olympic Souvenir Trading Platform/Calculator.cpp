@@ -13,6 +13,9 @@ std::vector<item> Calculator::__divide(std::string input)
 	vector<item> mid;
 	const set<char> legalChar = { '+','-','*','/','(',')' };
 	for (int i = 0; i < input.size(); i++) {
+		if (input[i] == '.') {
+			throw exception("Wrong number format.");
+		}
 		if (legalChar.contains(input[i])) {
 			mid.push_back({ false,0,input[i] });
 		}
@@ -69,7 +72,7 @@ void Calculator::__check(std::vector<item>& mid)
 			if (mid[i]._operator == '(') {
 				if (i - 1 >= 0 and mid[i - 1].isOperand)
 					throw exception("Missing operator.");
-				if (i + 1 < mid.size() and !mid[1 + 1].isOperand and mid[i + 1]._operator != '-')
+				if (i + 1 < mid.size() and !mid[i + 1].isOperand and mid[i + 1]._operator != '-')
 					throw exception("Missing operand.");
 			}
 			else if (mid[i]._operator == ')') {
