@@ -178,7 +178,9 @@ double Calculator::__calculate(std::vector<item>& back)
 	}
 	if (result.size() > 1)
 		throw exception("Wrong format.");
-	return result.top();
+	double ret = result.top();
+	ret = round(ret * 10) / 10.0;
+	return ret;
 }
 
 std::string Calculator::perform(std::string input)
@@ -188,7 +190,10 @@ std::string Calculator::perform(std::string input)
 		auto mid = __divide(input);
 		__check(mid);
 		auto back = __midToBack(mid);
-		return format("{:.1f}", __calculate(back));
+		auto result = format("{:.1f}", __calculate(back));
+		if (result.ends_with('0'))
+			result.pop_back(), result.pop_back();
+		return result;
 	}
 	catch (const std::exception& e)
 	{
