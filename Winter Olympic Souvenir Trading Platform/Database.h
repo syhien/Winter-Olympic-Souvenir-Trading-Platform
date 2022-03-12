@@ -6,7 +6,7 @@
 class Database
 {
 public:
-	Database(std::vector<std::pair<std::string, std::string> > inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"},{"recharge","recharge.txt"}
+	Database(std::vector<std::pair<std::string, std::string> > inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"},{"recharge","recharge.txt"},{"commands","commands.txt"}
 		});
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > perform(std::string command);
 	~Database();
@@ -17,6 +17,7 @@ private:
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __select(std::istringstream& stream);
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __insert(std::istringstream& stream);
 	std::vector<std::vector<std::pair<std::string, std::wstring> > > __update(std::istringstream& stream);
+	void __saveCommand(std::string command);
 	void __save();
 };
 
