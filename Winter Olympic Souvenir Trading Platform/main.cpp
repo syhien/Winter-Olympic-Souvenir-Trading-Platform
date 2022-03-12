@@ -11,6 +11,7 @@
 #include <ranges>
 #include <Windows.h>
 #include <ctype.h>
+#include <regex>
 using namespace std;
 
 Database database;
@@ -351,11 +352,106 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 	}
 }
 
-void SellerPage()
+void SellerPage(std::string id)
 {
+	bool keepHere = true;
+	wstring tmp;
+	string command;
+	auto allCommodity = database.perform("SELECT * from commodity");
+	vector<string> newCommodity;
+	while (keepHere) {
+		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
+		switch (getOperationCode())
+		{
+		case 1:
+			command = "INSERT INTO commodity VALUES (";
+			for (int i = 0; i < 999; i++) {
+				bool existed = false;
+				for (auto& j : allCommodity)
+					for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "itemID"; }))
+						existed = existed and k.second != format(L"M{:3}", i);
+				if (!existed) {
+					newCommodity.push_back(format("M{:3}", i));
+					break;
+				}
+			}
+
+			cout << "请输入商品名称：";
+			wcin >> tmp;
+			if (tmp.length() > 20)
+			{
+				cout << "商品名称过长，请重试" << endl;
+				break;
+			}
+			newCommodity.push_back(wstring2string(tmp));
+
+			cout << "请输入价格（至多精确至小数点后1位）：";
+			wcin >> tmp;
+			try
+			{
+				stod(tmp);
+				if (tmp.find('.') == wstring::npos and find(tmp.begin(), tmp.end(), '.') != tmp.end() - 2)
+					throw "";
+			}
+			catch (const std::exception&)
+			{
+				cout << "不正确的输入，请重试" << endl;
+				break;
+			}
+			newCommodity.push_back(format("{:.1f}", stod(tmp)));
+
+			cout << "请输入数量：";
+			wcin >> tmp;
+			try
+			{
+				stoi(tmp);
+				if (stoi(tmp) <= 0)
+					throw "";
+			}
+			catch (const std::exception&)
+			{
+				cout << "不正确的输入，请重试" << endl;
+				break;
+			}
+			newCommodity.push_back(format("{}", stoi(tmp)));
+
+			cout << "请输入200字内的商品描述：";
+			wcin >> tmp;
+			tmp = regex_replace(tmp, wregex(L"\."), L"，");
+			if (tmp.length() > 200) {
+				cout << "不正确的输入，请重试" << endl;
+				break;
+			}
+			newCommodity.push_back(wstring2string(tmp));
+			newCommodity.push_back(id);
+			newCommodity.push_back(getCurrentTime());
+			newCommodity.push_back(wstring2string(L"销售中"));
+
+			// to check whether to add
+
+			break;
+		case 2:
+
+			break;
+		case 3:
+
+			break;
+		case 4:
+
+			break;
+		case 5:
+
+			break;
+		case 6:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void BuyerPage()
+void BuyerPage(std::string id)
 {
 }
 
