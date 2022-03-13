@@ -80,21 +80,6 @@ void AdministatorPage(Administator& administator)
 	administator.HomePage();
 }
 
-static string wstring2string(wstring wstr)
-{
-	string result;
-	//获取缓冲区大小，并申请空间，缓冲区大小事按字节计算的  
-	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
-	char* buffer = new char[len + 1];
-	//宽字节编码转换成多字节编码  
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
-	buffer[len] = '\0';
-	//删除缓冲区并返回值  
-	result.append(buffer);
-	delete[] buffer;
-	return result;
-}
-
 void LogIn()
 {
 	bool checkName = false;
@@ -129,16 +114,19 @@ void LogIn()
 	}
 	cout << "登录成功\n";
 	bool keepHere = true;
+	string id;
+	for (auto& i : userInfo | views::filter([&](const pair<string, wstring>& j) {return j.first == "userID"; }))
+		id = wstring2string(i.second);
 	while (keepHere)
 	{
 		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.我是买家", L"2.我是卖家", L"3.管理个人信息", L"4.返回上层菜单");
 		switch (getOperationCode())
 		{
 		case 1:
-			BuyerPage();
+			BuyerPage(id);
 			break;
 		case 2:
-			SellerPage();
+			SellerPage(id);
 			break;
 		case 3:
 			InfoManagePage(userInfo);
@@ -357,7 +345,7 @@ void SellerPage(std::string id)
 	bool keepHere = true;
 	wstring tmp;
 	string command;
-	auto allCommodity = database.perform("SELECT * from commodity");
+	auto allCommodity = database.perform("SELECT * FROM commodity");
 	vector<string> newCommodity;
 	while (keepHere) {
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
@@ -390,8 +378,6 @@ void SellerPage(std::string id)
 			try
 			{
 				stod(tmp);
-				if (tmp.find('.') == wstring::npos and find(tmp.begin(), tmp.end(), '.') != tmp.end() - 2)
-					throw "";
 			}
 			catch (const std::exception&)
 			{
@@ -423,11 +409,38 @@ void SellerPage(std::string id)
 				break;
 			}
 			newCommodity.push_back(wstring2string(tmp));
+
 			newCommodity.push_back(id);
 			newCommodity.push_back(getCurrentTime());
 			newCommodity.push_back(wstring2string(L"销售中"));
 
-			// to check whether to add
+			cout << "请确认待添加商品的信息：" << endl << endl;
+			cout << "商品名称：" << newCommodity[1] << endl;
+			cout << "商品价格：" << newCommodity[2] << endl;
+			cout << "商品数量：" << newCommodity[3] << endl;
+			wcout << L"商品描述：" << string2wstring(newCommodity[4]) << endl << endl;
+
+			cout << "是否添加商品？输入1以添加，输入其他数字以放弃添加" << endl;
+			if (getOperationCode() == 1)
+			{
+				try
+				{
+					for (auto& i : newCommodity)
+						command += i + ",";
+					command.pop_back();
+					command += ")";
+					database.perform(command);
+					cout << "添加成功" << endl;
+				}
+				catch (const std::exception&)
+				{
+					cout << "操作未生效" << endl;
+				}
+			}
+			else
+			{
+				cout << "放弃添加" << endl;
+			}
 
 			break;
 		case 2:

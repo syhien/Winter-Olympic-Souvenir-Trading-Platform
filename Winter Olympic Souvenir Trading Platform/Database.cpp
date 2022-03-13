@@ -13,20 +13,9 @@
 #include <ctime>
 #include <ranges>
 #include <Windows.h>
+#include "terminal.h"
 #pragma warning(disable:4996)
 using namespace std;
-
-wstring string2wstring(string str)
-{
-	wstring result;
-	int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
-	TCHAR* buffer = new TCHAR[len + 1];
-	MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
-	buffer[len] = '\0';
-	result.append(buffer);
-	delete[] buffer;
-	return result;
-}
 
 Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 {
@@ -37,6 +26,8 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 	__columnOfTable["user"] = { "userID", "name","password","contact","address","wallet","state" };
 	__columnOfTable["recharge"] = { "userID","money","date" };
 	for (auto& i : inputFiles) {
+		if (i.first == "commands")
+			continue;
 		auto tableName = i.first;
 		auto tablePath = i.second;
 		try
