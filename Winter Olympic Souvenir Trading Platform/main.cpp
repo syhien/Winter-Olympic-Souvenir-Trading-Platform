@@ -347,6 +347,7 @@ void SellerPage(std::string id)
 	string command;
 	auto allCommodity = database.perform("SELECT * FROM commodity");
 	vector<string> newCommodity;
+	string itemID;
 	while (keepHere) {
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
 		switch (getOperationCode())
@@ -446,8 +447,9 @@ void SellerPage(std::string id)
 			break;
 		case 2:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
 			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
-			for (auto& line : allCommodity | views::filter([id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return false; }))
+			for (auto& line : allCommodity)
 			{
 				wcout << endl;
 				for (auto& i : line)
@@ -456,7 +458,20 @@ void SellerPage(std::string id)
 			}
 			break;
 		case 3:
-
+			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& line : allCommodity)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^19}", i.second);
+				wcout << "|\n";
+			}
+			cout << "请输入想要修改信息的商品的商品ID：";
+			cin >> itemID;
+			cout << "请选择想要本次修改的信息" << endl;
+			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.用户名", L"2.密码", L"3.联系方式", L"4.地址", L"5.放弃本次修改");
 			break;
 		case 4:
 
