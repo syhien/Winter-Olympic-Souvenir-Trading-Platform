@@ -61,5 +61,8 @@
     <Text Include="recharge.txt">
       <Filter>资源文件</Filter>
     </Text>
+    <Text Include="commands.txt">
+      <Filter>资源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -154,6 +154,7 @@
     <ClInclude Include="terminal.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="commands.txt" />
     <Text Include="commodity.txt" />
     <Text Include="order.txt" />
     <Text Include="recharge.txt" />

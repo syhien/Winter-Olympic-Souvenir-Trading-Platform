@@ -353,13 +353,14 @@ void SellerPage(std::string id)
 		{
 		case 1:
 			command = "INSERT INTO commodity VALUES (";
-			for (int i = 0; i < 999; i++) {
+			newCommodity.clear();
+			for (int i = 1; i < 999; i++) {
 				bool existed = false;
 				for (auto& j : allCommodity)
 					for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "itemID"; }))
-						existed = existed and k.second != format(L"M{:3}", i);
+						existed = existed or k.second == format(L"M{:0>3}", i);
 				if (!existed) {
-					newCommodity.push_back(format("M{:3}", i));
+					newCommodity.push_back(format("M{:0>3}", i));
 					break;
 				}
 			}
@@ -403,7 +404,7 @@ void SellerPage(std::string id)
 
 			cout << "请输入200字内的商品描述：";
 			wcin >> tmp;
-			tmp = regex_replace(tmp, wregex(L"\."), L"，");
+			tmp = regex_replace(tmp, wregex(L","), L"，");
 			if (tmp.length() > 200) {
 				cout << "不正确的输入，请重试" << endl;
 				break;
