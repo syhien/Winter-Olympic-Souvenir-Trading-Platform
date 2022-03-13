@@ -445,7 +445,15 @@ void SellerPage(std::string id)
 
 			break;
 		case 2:
-
+			allCommodity = database.perform("SELECT * FROM commodity");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& line : allCommodity | views::filter([id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return false; }))
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^19}", i.second);
+				wcout << "|\n";
+			}
 			break;
 		case 3:
 
