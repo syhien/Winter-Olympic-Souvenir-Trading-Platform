@@ -348,6 +348,7 @@ void SellerPage(std::string id)
 	auto allCommodity = database.perform("SELECT * FROM commodity");
 	vector<string> newCommodity;
 	string itemID;
+	string updateKey, updateValue;
 	while (keepHere) {
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
 		switch (getOperationCode())
@@ -458,6 +459,7 @@ void SellerPage(std::string id)
 			}
 			break;
 		case 3:
+			updateKey = "dont";
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
 			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
@@ -471,7 +473,78 @@ void SellerPage(std::string id)
 			cout << "请输入想要修改信息的商品的商品ID：";
 			cin >> itemID;
 			cout << "请选择想要本次修改的信息" << endl;
-			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.用户名", L"2.密码", L"3.联系方式", L"4.地址", L"5.放弃本次修改");
+			wcout << format(L"\n|{:^38}|{:^38}|{:^38}|{:^38}|\n", L"1.名称", L"2.价格", L"3.数量", L"4.描述");
+			switch (getOperationCode())
+			{
+			case 1:
+				cout << "请输入新名称：";
+				wcin >> tmp;
+				if (tmp.length() > 20)
+				{
+					cout << "商品名称过长，请重试" << endl;
+					break;
+				}
+				updateKey = "name";
+				updateValue = wstring2string(tmp);
+				break;
+			case 2:
+				cout << "请输入新价格：";
+				wcin >> tmp;
+				try
+				{
+					stod(tmp);
+				}
+				catch (const std::exception&)
+				{
+					cout << "不正确的输入，请重试" << endl;
+					break;
+				}
+				updateKey = "price";
+				updateValue = format("{:.1f}", stod(tmp));
+				break;
+			case 3:
+				cout << "请输入新数量：";
+				wcin >> tmp;
+				try
+				{
+					stoi(tmp);
+					if (stoi(tmp) <= 0)
+						throw "";
+				}
+				catch (const std::exception&)
+				{
+					cout << "不正确的输入，请重试" << endl;
+					break;
+				}
+				updateKey = "count";
+				updateValue = format("{}", stoi(tmp));
+				break;
+			case 4:
+				cout << "请输入新描述：";
+				wcin >> tmp;
+				tmp = regex_replace(tmp, wregex(L","), L"，");
+				if (tmp.length() > 200) {
+					cout << "不正确的输入，请重试" << endl;
+					break;
+				}
+				updateKey = "description";
+				updateValue = wstring2string(tmp);
+				break;
+			default:
+				break;
+			}
+			if (updateKey == "dont")
+				break;
+			try
+			{
+				command = format("UPDATE commodity SET {} = {} WHERE itemID = {}", updateKey, updateValue, itemID);
+				database.perform(command);
+				cout << "添加成功" << endl;
+			}
+			catch (const std::exception&)
+			{
+				cout << "操作未生效" << endl;
+			}
 			break;
 		case 4:
 
