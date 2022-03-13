@@ -349,6 +349,7 @@ void SellerPage(std::string id)
 	vector<string> newCommodity;
 	string itemID;
 	string updateKey, updateValue;
+	bool ableEdit;
 	while (keepHere) {
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
 		switch (getOperationCode())
@@ -547,7 +548,46 @@ void SellerPage(std::string id)
 			}
 			break;
 		case 4:
-
+			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& line : allCommodity)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^19}", i.second);
+				wcout << "|\n";
+			}
+			cout << "请输入想要下架的商品的商品ID：";
+			cin >> itemID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"销售中"; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != string2wstring(itemID); } return true; }), allCommodity.end());
+			if (allCommodity.empty()) {
+				cout << "无可下架商品的商品ID为" << itemID << endl;
+				break;
+			}
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& line : allCommodity)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^19}", i.second);
+				wcout << "|\n";
+			}
+			cout << "请确认是否下架商品，输入1以下架商品，输入其他数字取消下架\n";
+			if (getOperationCode() == 1) {
+				try
+				{
+					database.perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + itemID);
+					cout << "下架成功" << endl;
+				}
+				catch (const std::exception&)
+				{
+					cout << "操作未生效" << endl;
+				}
+			}
+			else
+				cout << "放弃下架商品" << endl;
 			break;
 		case 5:
 
