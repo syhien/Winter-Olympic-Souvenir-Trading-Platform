@@ -167,7 +167,17 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					wcout << format(L"|{:^37}", i.second);
 				}
 				else if (i.first == "wallet") {
-					wcout << format(L"|{:^37}", i.second);
+					try
+					{
+						if (stod(calculateWallet(wstring2string(userID))) < 0)
+							throw "";
+						database.perform("UPDATE user SET wallet = " + calculateWallet(wstring2string(userID)) + " WHERE userID = " + wstring2string(userID));
+						wcout << format(L"|{:^37}", string2wstring(calculateWallet(wstring2string(userID))));
+					}
+					catch (const std::exception&)
+					{
+						cout << endl << "Óà¶îÒì³£" << endl;
+					}
 				}
 			}
 			wcout << "|\n";
@@ -638,6 +648,81 @@ void BuyerPage(std::string id)
 		default:
 			break;
 		}
+	}
+}
+
+string calculateWallet(std::string userID)
+{
+	Calculator calculator;
+	auto allRecharge = database.perform("SELECT * FROM recharge WHERE userID CONTAINS " + userID);
+	allRecharge.erase(remove_if(allRecharge.begin(), allRecharge.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "userID") return wstring2string(j.second) != userID; } return true; }), allRecharge.end());
+	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID);
+	allBuyOrder.erase(remove_if(allBuyOrder.begin(), allBuyOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != userID; } return true; }), allBuyOrder.end());
+	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID);
+	allSellOrder.erase(remove_if(allSellOrder.begin(), allSellOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != userID; } return true; }), allSellOrder.end());
+	string command = "";
+	map<wstring, int> numbers;
+	for (auto& i : allRecharge)
+		for (auto& j : i)
+			if (j.first == "money") {
+				if (numbers.contains(j.second))
+					numbers[j.second]++;
+				else
+					numbers[j.second] = 1;
+			}
+	for (auto& i : allBuyOrder) {
+		int count;
+		wstring price;
+		for (auto& j : i)
+			if (j.first == "count")
+				count = stoi(j.second);
+			else if (j.first == "price")
+				price = L"-" + j.second;
+		if (numbers.contains(price))
+			numbers[price] += count;
+		else
+			numbers[price] = count;
+	}
+	for (auto& i : allSellOrder) {
+		int count;
+		wstring price;
+		for (auto& j : i)
+			if (j.first == "count")
+				count = stoi(j.second);
+			else if (j.first == "price")
+				price = j.second;
+		if (numbers.contains(price))
+			numbers[price] += count;
+		else
+			numbers[price] = count;
+	}
+	map<int, vector<string>> countNumbers;
+	for (auto& i : numbers)
+		countNumbers[i.second].push_back(wstring2string(i.first));
+	for (auto& i : countNumbers) {
+		if (command.length() == 0)
+			command += format("{}", i.first) + " * ";
+		else
+			command += " + " + format("{}", i.first) + "*";
+		command += "(";
+
+		string subCommand = "";
+		for (auto& j : i.second)
+			if (subCommand.length() == 0)
+				subCommand += format("{}", j);
+			else
+				subCommand += "+" + format("({})", j);
+		command += subCommand;
+
+		command += ")";
+	}
+	try
+	{
+		return calculator.perform(command);
+	}
+	catch (const std::exception&)
+	{
+		return "";
 	}
 }
 
