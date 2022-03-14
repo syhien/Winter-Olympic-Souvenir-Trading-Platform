@@ -61,4 +61,5 @@ TEST(CalculatorTest, TestResult) {
 	EXPECT_EQ(calculator.perform("2.04"), "2");
 	EXPECT_EQ(calculator.perform("1.1+0.9"), "2");
 	EXPECT_EQ(calculator.perform("318-30-318*0.1-318*60/800"), "232.4");
+	EXPECT_EQ(calculator.perform("1 * (10+(112.2)) + 30*(10.0)"), "422.2");
 }

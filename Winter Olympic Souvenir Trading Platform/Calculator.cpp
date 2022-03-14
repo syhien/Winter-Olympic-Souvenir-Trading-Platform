@@ -76,7 +76,7 @@ void Calculator::__check(std::vector<item>& mid)
 					throw exception("Missing operand.");
 			}
 			else if (mid[i]._operator == ')') {
-				if (i - 1 >= 0 and !mid[i - 1].isOperand)
+				if (i - 1 >= 0 and !mid[i - 1].isOperand and mid[i - 1]._operator != ')')
 					throw exception("Missing operand.");
 				if (i + 1 < mid.size() and mid[i + 1].isOperand)
 					throw exception("Missing operator.");
