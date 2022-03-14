@@ -349,7 +349,6 @@ void SellerPage(std::string id)
 	vector<string> newCommodity;
 	string itemID;
 	string updateKey, updateValue;
-	bool ableEdit;
 	while (keepHere) {
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
 		switch (getOperationCode())
@@ -560,8 +559,8 @@ void SellerPage(std::string id)
 			}
 			cout << "请输入想要下架的商品的商品ID：";
 			cin >> itemID;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"销售中"; } return true; }), allCommodity.end());
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != string2wstring(itemID); } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"销售中"; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != string2wstring(itemID); } return true; }), allCommodity.end());
 			if (allCommodity.empty()) {
 				cout << "无可下架商品的商品ID为" << itemID << endl;
 				break;
