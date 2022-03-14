@@ -612,6 +612,33 @@ void SellerPage(std::string id)
 
 void BuyerPage(std::string id)
 {
+	bool keepHere = true;
+	auto allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+	while (keepHere)
+	{
+		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.查看商品列表", L"2.购买商品", L"3.搜索商品", L"4.查看历史订单", L"5.查看商品详细信息", L"6.返回上层菜单");
+		switch (getOperationCode())
+		{
+		case 1:
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
+			for (auto& line : allCommodity)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					if (i.first == "description" or i.first == "state")
+						continue;
+					else
+						wcout << format(L"|{:^25}", i.second);
+				wcout << "|\n";
+			}
+			break;
+		case 6:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void SignUp()
