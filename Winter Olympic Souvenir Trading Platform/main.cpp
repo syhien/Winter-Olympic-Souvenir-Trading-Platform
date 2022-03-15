@@ -624,6 +624,13 @@ void BuyerPage(std::string id)
 {
 	bool keepHere = true;
 	auto allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+	auto allOrder = database.perform("SELECT * FROM order");
+	wstring itemID;
+	int count;
+	int availableCount;
+	double price;
+	string newOrderID;
+	string sellerID;
 	while (keepHere)
 	{
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.查看商品列表", L"2.购买商品", L"3.搜索商品", L"4.查看历史订单", L"5.查看商品详细信息", L"6.返回上层菜单");
@@ -640,6 +647,58 @@ void BuyerPage(std::string id)
 					else
 						wcout << format(L"|{:^25}", i.second);
 				wcout << "|\n";
+			}
+			break;
+		case 2:
+			cout << "请输入商品ID：";
+			wcin >> itemID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
+			if (allCommodity.size() == 0) {
+				cout << "商品不存在或不可购买" << endl;
+				break;
+			}
+			cout << "请输入购买数量：";
+			cin >> count;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [count](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "count") return stoi(j.second) < count; } return true; }), allCommodity.end());
+			if (allCommodity.size() == 0) {
+				cout << "商品数量不足，无法购买" << endl;
+				break;
+			}
+			for (auto& i : allCommodity.front())
+				if (i.first == "price")
+					price = stod(i.second);
+				else if (i.first == "count")
+					availableCount = stoi(i.second);
+				else if (i.first == "sellerID")
+					sellerID = wstring2string(i.second);
+			if (stod(calculateWallet(id)) < price * count) {
+				cout << "余额不足，无法购买" << endl;
+				break;
+			}
+			try
+			{
+				if (count == availableCount)
+					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"已下架") + " WHERE itemID = " + wstring2string(itemID));
+				else
+					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE itemID = " + wstring2string(itemID));
+				allOrder = database.perform("SELECT * FROM order");
+				for (int i = 1; i < 999; i++) {
+					bool existed = false;
+					for (auto& j : allOrder)
+						for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "orderID"; }))
+							existed = existed or k.second == format(L"M{:0>3}", i);
+					if (!existed) {
+						newOrderID = format("M{:0>3}", i);
+						break;
+					}
+				}
+				database.perform("INSERT INTO order VALUES " + format("({},{},{:.1f},{},{},{},{})", newOrderID, wstring2string(itemID), price, count, getCurrentTime(), sellerID, id));
+				database.perform("UPDATE user SET wallet = " + calculateWallet(id) + " WHERE userID = " + id);
+			}
+			catch (const std::exception&)
+			{
+				cout << "操作未生效" << endl;
 			}
 			break;
 		case 6:
