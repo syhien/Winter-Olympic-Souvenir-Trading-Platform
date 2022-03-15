@@ -637,6 +637,7 @@ void BuyerPage(std::string id)
 		switch (getOperationCode())
 		{
 		case 1:
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
 			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
 			for (auto& line : allCommodity)
 			{
@@ -650,6 +651,7 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 2:
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
 			cout << "请输入商品ID：";
 			wcin >> itemID;
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return true; }), allCommodity.end());
@@ -687,7 +689,7 @@ void BuyerPage(std::string id)
 					bool existed = false;
 					for (auto& j : allOrder)
 						for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "orderID"; }))
-							existed = existed or k.second == format(L"M{:0>3}", i);
+							existed = existed or k.second == format(L"T{:0>3}", i);
 					if (!existed) {
 						newOrderID = format("M{:0>3}", i);
 						break;
