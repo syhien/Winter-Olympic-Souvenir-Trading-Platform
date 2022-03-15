@@ -718,7 +718,18 @@ void BuyerPage(std::string id)
 						wcout << format(L"|{:^25}", i.second);
 				wcout << "|\n";
 			}
-
+			break;
+		case 4:
+			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id);
+			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			for (auto& line : allOrder)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					wcout << format(L"|{:^21}", i.second);
+				wcout << "|\n";
+			}
 			break;
 		case 6:
 			keepHere = false;
