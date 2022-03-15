@@ -191,13 +191,13 @@ std::string Calculator::perform(std::string input)
 		__check(mid);
 		auto back = __midToBack(mid);
 		auto result = format("{:.1f}", __calculate(back));
-		if (result.ends_with('0'))
-			result.pop_back(), result.pop_back();
+//		if (result.ends_with('0'))
+//			result.pop_back(), result.pop_back();
 		return result;
 	}
 	catch (const std::exception& e)
 	{
 		return e.what();
 	}
-    return std::string();
+	return std::string();
 }
