@@ -631,6 +631,7 @@ void BuyerPage(std::string id)
 	double price;
 	string newOrderID;
 	string sellerID;
+	wstring keyword;
 	while (keepHere)
 	{
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.查看商品列表", L"2.购买商品", L"3.搜索商品", L"4.查看历史订单", L"5.查看商品详细信息", L"6.返回上层菜单");
@@ -702,6 +703,22 @@ void BuyerPage(std::string id)
 			{
 				cout << "操作未生效" << endl;
 			}
+			break;
+		case 3:
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			cout << "请输入关键字：";
+			wcin >> keyword;
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
+			for (auto& line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> >& i) {for (auto& j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
+				wcout << endl;
+				for (auto& i : line)
+					if (i.first == "description" or i.first == "state")
+						continue;
+					else
+						wcout << format(L"|{:^25}", i.second);
+				wcout << "|\n";
+			}
+
 			break;
 		case 6:
 			keepHere = false;
