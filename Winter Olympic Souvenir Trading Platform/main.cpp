@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <ctype.h>
 #include <regex>
+#include <queue>
 using namespace std;
 
 Database database;
@@ -632,6 +633,7 @@ void BuyerPage(std::string id)
 	string newOrderID;
 	string sellerID;
 	wstring keyword;
+	vector<wstring> titles;
 	while (keepHere)
 	{
 		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.查看商品列表", L"2.购买商品", L"3.搜索商品", L"4.查看历史订单", L"5.查看商品详细信息", L"6.返回上层菜单");
@@ -730,6 +732,32 @@ void BuyerPage(std::string id)
 					wcout << format(L"|{:^21}", i.second);
 				wcout << "|\n";
 			}
+			break;
+		case 5:
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
+			for (auto& line : allCommodity)
+			{
+				wcout << endl;
+				for (auto& i : line)
+					if (i.first == "description" or i.first == "state")
+						continue;
+					else
+						wcout << format(L"|{:^25}", i.second);
+				wcout << "|\n";
+			}
+			cout << "请输入想要查看的商品ID：";
+			wcin >> itemID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
+			if (allCommodity.size() == 0) {
+				cout << "商品不存在或不可购买" << endl;
+				break;
+			}
+			titles = { L"商品ID", L"商品名称", L"价格", L"数量", L"描述", L"卖家ID", L"上架时间", L"销售状态" };
+			cout << endl;
+			for (auto& i : allCommodity.front())
+				wcout << titles.front() << L"：" << i.second << endl, titles.erase(titles.begin());
+			cout << endl;
 			break;
 		case 6:
 			keepHere = false;
