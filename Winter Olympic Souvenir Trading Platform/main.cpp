@@ -833,6 +833,8 @@ string calculateWallet(std::string userID)
 
 		command += ")";
 	}
+	if (command.length() == 0)
+		return "0.0";
 	try
 	{
 		return calculator.perform(command);
