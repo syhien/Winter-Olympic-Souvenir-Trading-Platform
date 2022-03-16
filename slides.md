@@ -166,7 +166,7 @@ void __handleUserPage();
 
 - 暴露一个方法以供所有类型的命令使用
 
-- 无权限检查
+- 自带基础的权限检查
 
 ---
 
@@ -198,6 +198,8 @@ void __handleUserPage();
 
 - 存放表名和表所在路径（默认是同目录下同名.txt文件） `vector<pair<string, string> > __tableFiles` 
 
+- 无权限检查的请求数据库的方法`__perform()`
+
 - 处理某个单独命令的方法 `vector<vector<pair<string, wstring> > > __select(istringstream& stream)`，作为参数的流是传入的命令的剩余部分
 
 - 保存所有表到文件的方法 `void __save()`
@@ -216,22 +218,6 @@ void __handleUserPage();
 
 `inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"},{"recharge","recharge.txt"} }`
 
----
-
-# 数据结构
-
-## `Database`类
-
-### 公有成员
-
-#### 操作方法`perform()`
-
-`perform()`的完整签名如下：
-`vector<vector<pair<string, wstring> > > perform(string command)`
-
-接受一个字符串（命令），将字符串作为流`stringstream`尝试解析。如发现错误，立即抛出错误停止处理。如命令正确，则将请求的结果返回。
-
-如果命令正确并且该命令对数据库产生了改动，`perform()`会立即调用`__save()`将改动写回文件
 
 ---
 
@@ -251,6 +237,40 @@ Database::~Database()
 	__save();
 }
 ```
+
+---
+
+# 数据结构
+
+## `Database`类
+
+### 公有成员
+
+#### 操作方法`perform()`
+
+`perform()`的完整函数签名为：`vector<vector<pair<string, wstring>>> Database::perform(string command, string sender, string mode)`
+
+`command`为指令，`sender`为请求的发起者（管理员或用户），`mode`为请求发起者的角色（买家或卖家或用户）
+
+`perform()`本身不进行数据请求，它会将指令转发给`__perform()`并将`__perform()`返回的结果根据指令的发起者、发起者的角色进行过滤（例如卖家查看历史订单时只能看到自己为卖家的订单）
+
+---
+
+# 数据结构
+
+## `Database`类
+
+### 私有成员
+
+#### 操作方法`__perform()`
+
+`__perform()`的完整签名如下：
+`vector<vector<pair<string, wstring> > > __perform(string command)`
+
+接受一个字符串（命令），将字符串作为流`stringstream`尝试解析。如发现错误，立即抛出错误停止处理。如命令正确，则将请求的结果返回。
+
+如果命令正确并且该命令对数据库产生了改动，`__perform()`会立即调用`__save()`将改动写回文件
+
 
 ---
 
@@ -354,7 +374,7 @@ map<char, int> comePriority = { {'#',0},{'(',6},{'*',4},{'/',4},{'+',2},{'-',2},
 
 ### 私有成员
 
-#### `double __calculate(std::vector<item>& back)`
+#### `double __calculate(vector<item>& back)`
 
 该方法最后被`perform()`调用，用于计算一个后缀表达式
 
