@@ -58,7 +58,27 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 	}
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::perform(std::string command)
+std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::perform(std::string command, std::string sender, std::string mode)
+{
+	auto result = __perform(command);
+	if (sender == "admin" and mode == "123456")
+		return result;
+	if (mode == "seller") {
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != sender; } return true; }), result.end());
+		return result;
+	}
+	if (mode == "buyer") {
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != sender; } return false; }), result.end());
+		return result;
+	}
+	if (mode == "user") {
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "userID") return wstring2string(j.second) != sender; } return true; }), result.end());
+		return result;
+	}
+	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+}
+
+std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__perform(std::string command)
 {
 	__saveCommand(command);
 	istringstream commandStream(command);

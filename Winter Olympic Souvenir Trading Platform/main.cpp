@@ -93,7 +93,7 @@ void LogIn()
 		wcin >> name;
 		cout << "请输入密码：";
 		wcin >> password;
-		for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(name))) {
+		for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(name), "admin", "123456")) {
 			for (auto& j : i) {
 				if (j.first == "name" and j.second == name)
 					checkName = true;
@@ -172,7 +172,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					{
 						if (stod(calculateWallet(wstring2string(userID))) < 0)
 							throw "";
-						database.perform("UPDATE user SET wallet = " + calculateWallet(wstring2string(userID)) + " WHERE userID = " + wstring2string(userID));
+						database.perform("UPDATE user SET wallet = " + calculateWallet(wstring2string(userID)) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
 						wcout << format(L"|{:^37}", string2wstring(calculateWallet(wstring2string(userID))));
 					}
 					catch (const std::exception&)
@@ -196,7 +196,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					cout << "用户名过长" << endl;
 					break;
 				}
-				for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(newValue)))
+				for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(newValue), wstring2string(userID), "user"))
 					for (auto& j : i)
 						if (j.first == "name" and j.second == newValue) {
 							editSuccess = false;
@@ -208,7 +208,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					{
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "name"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
 						cout << "修改用户名成功" << endl;
 					}
 					catch (const std::exception&)
@@ -241,7 +241,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					{
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "password"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
 						cout << "修改密码成功" << endl;
 					}
 					catch (const std::exception&)
@@ -271,7 +271,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					{
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "contact"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
 						cout << "修改联系方式成功" << endl;
 					}
 					catch (const std::exception&)
@@ -296,7 +296,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					{
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "address"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID));
+						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
 						cout << "修改地址成功" << endl;
 					}
 					catch (const std::exception&)
@@ -334,8 +334,8 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					oldValue = i.second;
 					i.second = format(L"{:.1f}", stod(oldValue) + stod(newValue));
 				}
-				database.perform("UPDATE user SET wallet = " + wstring2string(format(L"{:.1f}", stod(oldValue) + stod(newValue))) + " WHERE userID = " + wstring2string(userID));
-				database.perform("INSERT INTO recharge VALUES (" + wstring2string(userID) + "," + wstring2string(newValue) + "," + getCurrentTime() + ")");
+				database.perform("UPDATE user SET wallet = " + wstring2string(format(L"{:.1f}", stod(oldValue) + stod(newValue))) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
+				database.perform("INSERT INTO recharge VALUES (" + wstring2string(userID) + "," + wstring2string(newValue) + "," + getCurrentTime() + ")", wstring2string(userID), "user");
 			}
 			catch (const std::exception&)
 			{
@@ -356,8 +356,8 @@ void SellerPage(std::string id)
 	bool keepHere = true;
 	wstring tmp;
 	string command;
-	auto allCommodity = database.perform("SELECT * FROM commodity");
-	auto allOrder = database.perform("SELECT * FROM order");
+	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	auto allOrder = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 	vector<string> newCommodity;
 	string itemID;
 	string updateKey, updateValue;
@@ -444,7 +444,7 @@ void SellerPage(std::string id)
 						command += i + ",";
 					command.pop_back();
 					command += ")";
-					database.perform(command);
+					database.perform(command, id, "seller");
 					cout << "添加成功" << endl;
 				}
 				catch (const std::exception&)
@@ -459,7 +459,7 @@ void SellerPage(std::string id)
 
 			break;
 		case 2:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
 			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto& line : allCommodity)
@@ -472,7 +472,7 @@ void SellerPage(std::string id)
 			break;
 		case 3:
 			updateKey = "dont";
-			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
 			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto& line : allCommodity)
@@ -550,7 +550,7 @@ void SellerPage(std::string id)
 			try
 			{
 				command = format("UPDATE commodity SET {} = {} WHERE itemID = {}", updateKey, updateValue, itemID);
-				database.perform(command);
+				database.perform(command, id, "seller");
 				cout << "添加成功" << endl;
 			}
 			catch (const std::exception&)
@@ -559,7 +559,7 @@ void SellerPage(std::string id)
 			}
 			break;
 		case 4:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id);
+			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
 			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 			for (auto& line : allCommodity)
@@ -589,7 +589,7 @@ void SellerPage(std::string id)
 			if (getOperationCode() == 1) {
 				try
 				{
-					database.perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + itemID);
+					database.perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + itemID, id, "seller");
 					cout << "下架成功" << endl;
 				}
 				catch (const std::exception&)
@@ -601,7 +601,7 @@ void SellerPage(std::string id)
 				cout << "放弃下架商品" << endl;
 			break;
 		case 5:
-			allOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + id);
+			allOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + id, id, "seller");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
 			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
 			for (auto& line : allOrder)
@@ -624,8 +624,8 @@ void SellerPage(std::string id)
 void BuyerPage(std::string id)
 {
 	bool keepHere = true;
-	auto allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
-	auto allOrder = database.perform("SELECT * FROM order");
+	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	auto allOrder = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
 	wstring itemID;
 	int count;
 	int availableCount;
@@ -640,7 +640,7 @@ void BuyerPage(std::string id)
 		switch (getOperationCode())
 		{
 		case 1:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
 			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
 			for (auto& line : allCommodity)
 			{
@@ -654,7 +654,7 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 2:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
 			cout << "请输入商品ID：";
 			wcin >> itemID;
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return true; }), allCommodity.end());
@@ -684,10 +684,10 @@ void BuyerPage(std::string id)
 			try
 			{
 				if (count == availableCount)
-					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"已下架") + " WHERE itemID = " + wstring2string(itemID));
+					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"已下架") + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
 				else
-					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE itemID = " + wstring2string(itemID));
-				allOrder = database.perform("SELECT * FROM order");
+					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
+				allOrder = database.perform("SELECT * FROM order", id, "buyer");
 				for (int i = 1; i < 999; i++) {
 					bool existed = false;
 					for (auto& j : allOrder)
@@ -698,8 +698,8 @@ void BuyerPage(std::string id)
 						break;
 					}
 				}
-				database.perform("INSERT INTO order VALUES " + format("({},{},{:.1f},{},{},{},{})", newOrderID, wstring2string(itemID), price, count, getCurrentTime(), sellerID, id));
-				database.perform("UPDATE user SET wallet = " + calculateWallet(id) + " WHERE userID = " + id);
+				database.perform("INSERT INTO order VALUES " + format("({},{},{:.1f},{},{},{},{})", newOrderID, wstring2string(itemID), price, count, getCurrentTime(), sellerID, id), id, "buyer");
+				database.perform("UPDATE user SET wallet = " + calculateWallet(id) + " WHERE userID = " + id, id, "buyer");
 			}
 			catch (const std::exception&)
 			{
@@ -707,7 +707,7 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 3:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
 			cout << "请输入关键字：";
 			wcin >> keyword;
 			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
@@ -722,7 +722,7 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 4:
-			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id);
+			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id, id, "buyer");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
 			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
 			for (auto& line : allOrder)
@@ -734,7 +734,7 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 5:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"));
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
 			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
 			for (auto& line : allCommodity)
 			{
@@ -771,11 +771,11 @@ void BuyerPage(std::string id)
 string calculateWallet(std::string userID)
 {
 	Calculator calculator;
-	auto allRecharge = database.perform("SELECT * FROM recharge WHERE userID CONTAINS " + userID);
+	auto allRecharge = database.perform("SELECT * FROM recharge WHERE userID CONTAINS " + userID, userID, "user");
 	allRecharge.erase(remove_if(allRecharge.begin(), allRecharge.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "userID") return wstring2string(j.second) != userID; } return true; }), allRecharge.end());
-	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID);
+	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID, userID, "user");
 	allBuyOrder.erase(remove_if(allBuyOrder.begin(), allBuyOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != userID; } return true; }), allBuyOrder.end());
-	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID);
+	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID, userID, "user");
 	allSellOrder.erase(remove_if(allSellOrder.begin(), allSellOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != userID; } return true; }), allSellOrder.end());
 	string command = "";
 	map<wstring, int> numbers;

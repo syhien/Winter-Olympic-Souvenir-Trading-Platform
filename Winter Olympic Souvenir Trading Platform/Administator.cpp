@@ -47,14 +47,14 @@ void Administator::HomePage()
 void Administator::__handleCommodityPage()
 {
 	bool keepHere = true;
-	auto allCommodity = __database->perform("SELECT * FROM commodity");
+	auto allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 	auto selectedCommodity = allCommodity;
 	int tmpInt;
 	wstring keyword;
 	while (keepHere) {
 		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.查看所有商品", L"2.检索商品", L"3.下架商品", L"4.返回上层菜单");
 		auto operationCode = getOperationCode();
-		allCommodity = __database->perform("SELECT * FROM commodity");
+		allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
@@ -91,7 +91,7 @@ void Administator::__handleCommodityPage()
 			wcin >> keyword;
 			try
 			{
-				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE itemID CONTAINS " + wstring2string(keyword));
+				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE itemID CONTAINS " + wstring2string(keyword), "admin", "123456");
 				cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
 				for (auto& line : selectedCommodity)
 				{
@@ -106,7 +106,7 @@ void Administator::__handleCommodityPage()
 					cout << "已取消下架" << endl;
 					break;
 				}
-				__database->perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + wstring2string(keyword));
+				__database->perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + wstring2string(keyword), "admin", "123456");
 				cout << "下架成功\n";
 			}
 			catch (const std::exception& e)
@@ -127,12 +127,12 @@ void Administator::__handleCommodityPage()
 void Administator::__handleOrderPage()
 {
 	bool keepHere = true;
-	auto allOrder = __database->perform("SELECT * FROM order");
+	auto allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 	wstring keyword;
 	while (keepHere) {
 		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有订单", L"2.检索订单", L"3.返回上层菜单");
 		auto operationCode = getOperationCode();
-		allOrder = __database->perform("SELECT * FROM order");
+		allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
@@ -168,14 +168,14 @@ void Administator::__handleOrderPage()
 void Administator::__handleUserPage()
 {
 	bool keepHere = true;
-	auto allUser = __database->perform("SELECT * FROM user");
+	auto allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 	auto selectedUser = allUser;
 	wstring keyword;
 	int tmpInt;
 	while (keepHere) {
 		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有用户", L"2.封禁用户", L"3.返回上层菜单");
 		auto operationCode = getOperationCode();
-		allUser = __database->perform("SELECT * FROM user");
+		allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
@@ -201,7 +201,7 @@ void Administator::__handleUserPage()
 			wcin >> keyword;
 			try
 			{
-				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + wstring2string(keyword));
+				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + wstring2string(keyword), "admin", "123456");
 				cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
 				for (auto& line : selectedUser)
 				{
@@ -216,7 +216,7 @@ void Administator::__handleUserPage()
 					cout << "已取消封禁" << endl;
 					break;
 				}
-				__database->perform("UPDATE user SET state = 封禁 WHERE userID = " + wstring2string(keyword));
+				__database->perform("UPDATE user SET state = 封禁 WHERE userID = " + wstring2string(keyword), "admin", "123456");
 				cout << "封禁成功\n";
 			}
 			catch (const std::exception& e)
