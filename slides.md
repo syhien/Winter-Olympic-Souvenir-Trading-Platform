@@ -198,7 +198,18 @@ void __handleUserPage();
 
 - 存放表名和表所在路径（默认是同目录下同名.txt文件） `vector<pair<string, string> > __tableFiles` 
 
+---
+
+# 数据结构
+
+## `Database`类
+
+### 私有成员
+
+
 - 无权限检查的请求数据库的方法`__perform()`
+
+- 保存数据库指令到日志文件的方法`__saveCommand()`
 
 - 处理某个单独命令的方法 `vector<vector<pair<string, wstring> > > __select(istringstream& stream)`，作为参数的流是传入的命令的剩余部分
 
