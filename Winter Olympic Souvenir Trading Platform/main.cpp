@@ -46,7 +46,7 @@ bool WelcomePage(Administator& administator) {
 		LogIn();
 		break;
 	case 2:
-		//
+		SignUp();
 		break;
 	case 3:
 		cout << "退出欢迎页\n";
@@ -845,4 +845,104 @@ string calculateWallet(std::string userID)
 
 void SignUp()
 {
+	auto allUser = database.perform("SELECT * FROM user", "admin", "123456");
+	vector<string> newUser;
+	for (int i = 1; i < 999; i++) {
+		bool existed = false;
+		for (auto& j : allUser)
+			for (auto& k : j | views::filter([i](const pair<string, wstring>& l) {return l.first == "userID"; }))
+				existed = existed or k.second == format(L"U{:0>3}", i);
+		if (!existed) {
+			newUser.push_back(format("U{:0>3}", i));
+			break;
+		}
+	}
+
+	wstring tmp;
+	cout << "请输入用户名：";
+	wcin >> tmp;
+	if (tmp.length() > 10) {
+		cout << "用户名过长" << endl;
+		return;
+	}
+	auto nameFound = false;
+	for (auto& i : allUser)
+		for (auto& j : i)
+			if (j.first == "name")
+				nameFound = nameFound or j.second == tmp;
+	if (nameFound) {
+		cout << "该用户名已被注册" << endl;
+		return;
+	}
+	newUser.push_back(wstring2string(tmp));
+
+	cout << "请输入密码：";
+	wcin >> tmp;
+	if (tmp.size() > 20) {
+		cout << "密码过长" << endl;
+		return;
+	}
+	for (auto& i : tmp) {
+		if (!isdigit(i) and !islower(i))
+		{
+			cout << "密码仅允许由小写字母和数字组成" << endl;
+			return;
+		}
+	}
+	newUser.push_back(wstring2string(tmp));
+	
+	cout << "请输入联系方式：";
+	wcin >> tmp;
+	if (tmp.size() > 20) {
+		cout << "联系方式过长" << endl;
+		return;
+	}
+	for (auto& i : tmp) {
+		if (!isdigit(i))
+		{
+			cout << "联系方式仅允许由数字组成" << endl;
+			return;
+		}
+	}
+	newUser.push_back(wstring2string(tmp));
+
+	cout << "请输入联络地址：";
+	wcin >> tmp;
+	if (tmp.size() > 40) {
+		cout << "联络地址过长" << endl;
+		return;
+	}
+	newUser.push_back(wstring2string(tmp));
+
+	newUser.push_back("0.0");
+
+	newUser.push_back(wstring2string(L"正常"));
+
+	cout << "请确认注册信息：" << endl << endl;
+	wcout << L"用户名：" << string2wstring(newUser[1]) << endl;
+	wcout << L"密码：" << string2wstring(newUser[2]) << endl;
+	wcout << L"联系方式：" << string2wstring(newUser[3]) << endl;
+	wcout << L"联络地址：" << string2wstring(newUser[4]) << endl;
+	cout << endl;
+
+	cout << "输入1以确认注册，输入其他数字取消注册" << endl;
+	if (getOperationCode() == 1) {
+		try
+		{
+			string command = "INSERT INTO user VALUES (";
+			for (auto& i : newUser)
+				command += i + ",";
+			command.pop_back();
+			command += ")";
+			database.perform(command, "admin", "123456");
+			cout << "注册成功，返回上层页面" << endl;
+		}
+		catch (const std::exception&)
+		{
+			cout << "操作未生效" << endl;
+		}
+	}
+	else {
+		cout << "放弃注册" << endl;
+	}
 }
