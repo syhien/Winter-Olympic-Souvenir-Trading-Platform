@@ -25,20 +25,20 @@ int main(int argc, char* args[]) {
 
 	while (WelcomePage(administator));
 
-	cout << "ÍË³ö³ÌÐò\n";
+	cout << "é€€å‡ºç¨‹åº\n";
 	return 0;
 }
 
 bool WelcomePage(Administator& administator) {
 	int operationCode;
-	wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.ÓÃ»§µÇÂ¼", L"2.ÓÃ»§×¢²á", L"3.ÍË³ö³ÌÐò", L"4.¹ÜÀíÔ±µÇÂ¼");
+	wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.ç”¨æˆ·ç™»å½•", L"2.ç”¨æˆ·æ³¨å†Œ", L"3.é€€å‡ºç¨‹åº", L"4.ç®¡ç†å‘˜ç™»å½•");
 	while (true)
 	{
 		operationCode = getOperationCode();
 		if (operationCode == 1 or operationCode == 2 or operationCode == 3 or operationCode == 4)
 			break;
 		else
-			cout << "ÎÞ´Ë²Ù×÷\n";
+			cout << "æ— æ­¤æ“ä½œ\n";
 	}
 	switch (operationCode)
 	{
@@ -49,7 +49,7 @@ bool WelcomePage(Administator& administator) {
 		SignUp();
 		break;
 	case 3:
-		cout << "ÍË³ö»¶Ó­Ò³\n";
+		cout << "é€€å‡ºæ¬¢è¿Žé¡µ\n";
 		return false;
 	case 4:
 		AdministatorPage(administator);
@@ -63,21 +63,21 @@ bool WelcomePage(Administator& administator) {
 void AdministatorPage(Administator& administator)
 {
 	string name, password;
-	cout << "ÊäÈë¹ÜÀíÔ±ÕË»§Ãû£º";
+	cout << "è¾“å…¥ç®¡ç†å‘˜è´¦æˆ·åï¼š";
 	cin >> name;
-	cout << "ÊäÈë¹ÜÀíÔ±ÃÜÂë£º";
+	cout << "è¾“å…¥ç®¡ç†å‘˜å¯†ç ï¼š";
 	cin >> password;
 	while (administator.login(name, password) == false)
 	{
-		cout << "¹ÜÀíÔ±ÕËºÅ»òÃÜÂë´íÎó\nÊÇ·ñÔÙ´Î³¢ÊÔ£¿\nÊäÈë1ÖØÊÔ£¬ÊäÈëÆäËûÈÎÒâÊý×Ö·ÅÆúÖØÊÔ\n";
+		cout << "ç®¡ç†å‘˜è´¦å·æˆ–å¯†ç é”™è¯¯\næ˜¯å¦å†æ¬¡å°è¯•ï¼Ÿ\nè¾“å…¥1é‡è¯•ï¼Œè¾“å…¥å…¶ä»–ä»»æ„æ•°å­—æ”¾å¼ƒé‡è¯•\n";
 		if (getOperationCode() != 1)
 			return;
-		cout << "ÊäÈë¹ÜÀíÔ±ÕË»§Ãû£º";
+		cout << "è¾“å…¥ç®¡ç†å‘˜è´¦æˆ·åï¼š";
 		cin >> name;
-		cout << "ÊäÈë¹ÜÀíÔ±ÃÜÂë£º";
+		cout << "è¾“å…¥ç®¡ç†å‘˜å¯†ç ï¼š";
 		cin >> password;
 	}
-	cout << "µÇÂ¼³É¹¦£¡\n";
+	cout << "ç™»å½•æˆåŠŸï¼\n";
 	administator.HomePage();
 }
 
@@ -89,9 +89,9 @@ void LogIn()
 	while (!checkName or !checkPassword)
 	{
 		wstring name, password;
-		cout << "ÇëÊäÈëÓÃ»§Ãû£º";
+		cout << "è¯·è¾“å…¥ç”¨æˆ·åï¼š";
 		wcin >> name;
-		cout << "ÇëÊäÈëÃÜÂë£º";
+		cout << "è¯·è¾“å…¥å¯†ç ï¼š";
 		wcin >> password;
 		for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(name), "admin", "123456")) {
 			for (auto& j : i) {
@@ -99,8 +99,8 @@ void LogIn()
 					checkName = true;
 				if (j.first == "password" and j.second == password)
 					checkPassword = true;
-				if (j.first == "state" and j.second == L"·â½û") {
-					cout << "ÓÃ»§ÒÑ±»·â½û" << endl;
+				if (j.first == "state" and j.second == L"å°ç¦") {
+					cout << "ç”¨æˆ·å·²è¢«å°ç¦" << endl;
 					return;
 				}
 			}
@@ -108,19 +108,19 @@ void LogIn()
 				userInfo = i;
 		}
 		if (!checkName or !checkPassword) {
-			cout << "ÕËºÅ»òÃÜÂë´íÎó\nÊÇ·ñÔÙ´Î³¢ÊÔ£¿\nÊäÈë1ÖØÊÔ£¬ÊäÈëÆäËûÈÎÒâÊý×Ö·ÅÆúÖØÊÔ\n";
+			cout << "è´¦å·æˆ–å¯†ç é”™è¯¯\næ˜¯å¦å†æ¬¡å°è¯•ï¼Ÿ\nè¾“å…¥1é‡è¯•ï¼Œè¾“å…¥å…¶ä»–ä»»æ„æ•°å­—æ”¾å¼ƒé‡è¯•\n";
 			if (getOperationCode() != 1)
 				return;
 		}
 	}
-	cout << "µÇÂ¼³É¹¦\n";
+	cout << "ç™»å½•æˆåŠŸ\n";
 	bool keepHere = true;
 	string id;
 	for (auto& i : userInfo | views::filter([&](const pair<string, wstring>& j) {return j.first == "userID"; }))
 		id = wstring2string(i.second);
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.ÎÒÊÇÂò¼Ò", L"2.ÎÒÊÇÂô¼Ò", L"3.¹ÜÀí¸öÈËÐÅÏ¢", L"4.·µ»ØÉÏ²ã²Ëµ¥");
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.æˆ‘æ˜¯ä¹°å®¶", L"2.æˆ‘æ˜¯å–å®¶", L"3.ç®¡ç†ä¸ªäººä¿¡æ¯", L"4.è¿”å›žä¸Šå±‚èœå•");
 		switch (getOperationCode())
 		{
 		case 1:
@@ -152,11 +152,11 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 		userID = i.second;
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.²é¿´ÐÅÏ¢", L"2.ÐÞ¸ÄÐÅÏ¢", L"3.³äÖµ", L"4.·µ»ØÉÏ²ã²Ëµ¥");
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.æŸ¥çœ‹ä¿¡æ¯", L"2.ä¿®æ”¹ä¿¡æ¯", L"3.å……å€¼", L"4.è¿”å›žä¸Šå±‚èœå•");
 		switch (getOperationCode())
 		{
 		case 1:
-			wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"ÓÃ»§Ãû", L"ÁªÏµ·½Ê½", L"µØÖ·", L"Ç®°üÓà¶î");
+			wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"ç”¨æˆ·å", L"è”ç³»æ–¹å¼", L"åœ°å€", L"é’±åŒ…ä½™é¢");
 			for (auto& i : userInfo) {
 				if (i.first == "name") {
 					wcout << format(L"|{:^37}", i.second);
@@ -177,30 +177,30 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					}
 					catch (const std::exception&)
 					{
-						cout << endl << "Óà¶îÒì³£" << endl;
+						cout << endl << "ä½™é¢å¼‚å¸¸" << endl;
 					}
 				}
 			}
 			wcout << "|\n";
 			break;
 		case 2:
-			cout << "ÇëÑ¡ÔñÏëÒª±¾´ÎÐÞ¸ÄµÄÐÅÏ¢" << endl;
-			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.ÓÃ»§Ãû", L"2.ÃÜÂë", L"3.ÁªÏµ·½Ê½", L"4.µØÖ·", L"5.·ÅÆú±¾´ÎÐÞ¸Ä");
+			cout << "è¯·é€‰æ‹©æƒ³è¦æœ¬æ¬¡ä¿®æ”¹çš„ä¿¡æ¯" << endl;
+			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.ç”¨æˆ·å", L"2.å¯†ç ", L"3.è”ç³»æ–¹å¼", L"4.åœ°å€", L"5.æ”¾å¼ƒæœ¬æ¬¡ä¿®æ”¹");
 			switch (getOperationCode())
 			{
 			case 1:
 				editSuccess = true;
-				cout << "ÇëÊäÈëÐÂÓÃ»§Ãû£º";
+				cout << "è¯·è¾“å…¥æ–°ç”¨æˆ·åï¼š";
 				wcin >> newValue;
 				if (newValue.size() > 10) {
-					cout << "ÓÃ»§Ãû¹ý³¤" << endl;
+					cout << "ç”¨æˆ·åè¿‡é•¿" << endl;
 					break;
 				}
 				for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(newValue), wstring2string(userID), "user"))
 					for (auto& j : i)
 						if (j.first == "name" and j.second == newValue) {
 							editSuccess = false;
-							cout << "¸ÃÓÃ»§ÃûÒÑ±»Õ¼ÓÃ" << endl;
+							cout << "è¯¥ç”¨æˆ·åå·²è¢«å ç”¨" << endl;
 							break;
 						}
 				if (editSuccess) {
@@ -209,29 +209,29 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "name"; }))
 							i.second = newValue;
 						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "ÐÞ¸ÄÓÃ»§Ãû³É¹¦" << endl;
+						cout << "ä¿®æ”¹ç”¨æˆ·åæˆåŠŸ" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "²Ù×÷Î´ÉúÐ§" << endl;
+						cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 					}
 				}
 				else {
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 				break;
 			case 2:
 				editSuccess = true;
-				cout << "ÇëÊäÈëÐÂÃÜÂë£º";
+				cout << "è¯·è¾“å…¥æ–°å¯†ç ï¼š";
 				wcin >> newValue;
 				if (newValue.size() > 20) {
-					cout << "ÃÜÂë¹ý³¤" << endl;
+					cout << "å¯†ç è¿‡é•¿" << endl;
 					break;
 				}
 				for (auto& i : newValue) {
 					if (!isdigit(i) and !islower(i))
 					{
-						cout << "ÃÜÂë½öÔÊÐíÓÉÐ¡Ð´×ÖÄ¸ºÍÊý×Ö×é³É" << endl;
+						cout << "å¯†ç ä»…å…è®¸ç”±å°å†™å­—æ¯å’Œæ•°å­—ç»„æˆ" << endl;
 						editSuccess = false;
 						break;
 					}
@@ -242,27 +242,27 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "password"; }))
 							i.second = newValue;
 						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "ÐÞ¸ÄÃÜÂë³É¹¦" << endl;
+						cout << "ä¿®æ”¹å¯†ç æˆåŠŸ" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "²Ù×÷Î´ÉúÐ§" << endl;
+						cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 					}
 				}
 				else {
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 				break;
 			case 3:
 				editSuccess = true;
-				cout << "ÇëÊäÈëÐÂÁªÏµ·½Ê½£º";
+				cout << "è¯·è¾“å…¥æ–°è”ç³»æ–¹å¼ï¼š";
 				wcin >> newValue;
 				if (newValue.size() > 20) {
-					cout << "ÁªÏµ·½Ê½¹ý³¤" << endl;
+					cout << "è”ç³»æ–¹å¼è¿‡é•¿" << endl;
 					break;
 				}
 				for (auto& i : newValue | views::filter([](const wchar_t j) {return !isdigit(j); })) {
-					cout << "ÁªÏµ·½Ê½½öÔÊÐíÓÉÊý×Ö×é³É" << endl;
+					cout << "è”ç³»æ–¹å¼ä»…å…è®¸ç”±æ•°å­—ç»„æˆ" << endl;
 					editSuccess = false;
 					break;
 				}
@@ -272,23 +272,23 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "contact"; }))
 							i.second = newValue;
 						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "ÐÞ¸ÄÁªÏµ·½Ê½³É¹¦" << endl;
+						cout << "ä¿®æ”¹è”ç³»æ–¹å¼æˆåŠŸ" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "²Ù×÷Î´ÉúÐ§" << endl;
+						cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 					}
 				}
 				else {
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 				break;
 			case 4:
 				editSuccess = true;
-				cout << "ÇëÊäÈëÐÂµØÖ·£º";
+				cout << "è¯·è¾“å…¥æ–°åœ°å€ï¼š";
 				wcin >> newValue;
 				if (newValue.size() > 40) {
-					cout << "µØÖ·¹ý³¤" << endl;
+					cout << "åœ°å€è¿‡é•¿" << endl;
 					break;
 				}
 				if (editSuccess) {
@@ -297,26 +297,26 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "address"; }))
 							i.second = newValue;
 						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "ÐÞ¸ÄµØÖ·³É¹¦" << endl;
+						cout << "ä¿®æ”¹åœ°å€æˆåŠŸ" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "²Ù×÷Î´ÉúÐ§" << endl;
+						cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 					}
 				}
 				else {
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 				break;
 			case 5:
-				cout << "·ÅÆúÐÞ¸Ä" << endl;
+				cout << "æ”¾å¼ƒä¿®æ”¹" << endl;
 				break;
 			default:
 				break;
 			}
 			break;
 		case 3:
-			cout << "ÇëÊäÈë³äÖµ½ð¶î£º";
+			cout << "è¯·è¾“å…¥å……å€¼é‡‘é¢ï¼š";
 			wcin >> newValue;
 			try
 			{
@@ -339,7 +339,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 			}
 			catch (const std::exception&)
 			{
-				cout << "½ð¶î½öÖ§³Ö×î¶àº¬1Î»Ð¡ÊýµÄ·Ç¸ºÊýÖµ" << endl;
+				cout << "é‡‘é¢ä»…æ”¯æŒæœ€å¤šå«1ä½å°æ•°çš„éžè´Ÿæ•°å€¼" << endl;
 			}
 			break;
 		case 4:
@@ -362,7 +362,7 @@ void SellerPage(std::string id)
 	string itemID;
 	string updateKey, updateValue;
 	while (keepHere) {
-		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.·¢²¼ÉÌÆ·", L"2.²é¿´·¢²¼ÉÌÆ·", L"3.ÐÞ¸ÄÉÌÆ·ÐÅÏ¢", L"4.ÏÂ¼ÜÉÌÆ·", L"5.²é¿´ÀúÊ·¶©µ¥", L"6.·µ»ØÉÏ²ã²Ëµ¥");
+		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.å‘å¸ƒå•†å“", L"2.æŸ¥çœ‹å‘å¸ƒå•†å“", L"3.ä¿®æ”¹å•†å“ä¿¡æ¯", L"4.ä¸‹æž¶å•†å“", L"5.æŸ¥çœ‹åŽ†å²è®¢å•", L"6.è¿”å›žä¸Šå±‚èœå•");
 		switch (getOperationCode())
 		{
 		case 1:
@@ -379,16 +379,16 @@ void SellerPage(std::string id)
 				}
 			}
 
-			cout << "ÇëÊäÈëÉÌÆ·Ãû³Æ£º";
+			cout << "è¯·è¾“å…¥å•†å“åç§°ï¼š";
 			wcin >> tmp;
 			if (tmp.length() > 20)
 			{
-				cout << "ÉÌÆ·Ãû³Æ¹ý³¤£¬ÇëÖØÊÔ" << endl;
+				cout << "å•†å“åç§°è¿‡é•¿ï¼Œè¯·é‡è¯•" << endl;
 				break;
 			}
 			newCommodity.push_back(wstring2string(tmp));
 
-			cout << "ÇëÊäÈë¼Û¸ñ£¨ÖÁ¶à¾«È·ÖÁÐ¡Êýµãºó1Î»£©£º";
+			cout << "è¯·è¾“å…¥ä»·æ ¼ï¼ˆè‡³å¤šç²¾ç¡®è‡³å°æ•°ç‚¹åŽ1ä½ï¼‰ï¼š";
 			wcin >> tmp;
 			try
 			{
@@ -396,12 +396,12 @@ void SellerPage(std::string id)
 			}
 			catch (const std::exception&)
 			{
-				cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+				cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 				break;
 			}
 			newCommodity.push_back(format("{:.1f}", stod(tmp)));
 
-			cout << "ÇëÊäÈëÊýÁ¿£º";
+			cout << "è¯·è¾“å…¥æ•°é‡ï¼š";
 			wcin >> tmp;
 			try
 			{
@@ -411,31 +411,31 @@ void SellerPage(std::string id)
 			}
 			catch (const std::exception&)
 			{
-				cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+				cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 				break;
 			}
 			newCommodity.push_back(format("{}", stoi(tmp)));
 
-			cout << "ÇëÊäÈë200×ÖÄÚµÄÉÌÆ·ÃèÊö£º";
+			cout << "è¯·è¾“å…¥200å­—å†…çš„å•†å“æè¿°ï¼š";
 			wcin >> tmp;
-			tmp = regex_replace(tmp, wregex(L","), L"£¬");
+			tmp = regex_replace(tmp, wregex(L","), L"ï¼Œ");
 			if (tmp.length() > 200) {
-				cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+				cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 				break;
 			}
 			newCommodity.push_back(wstring2string(tmp));
 
 			newCommodity.push_back(id);
 			newCommodity.push_back(getCurrentTime());
-			newCommodity.push_back(wstring2string(L"ÏúÊÛÖÐ"));
+			newCommodity.push_back(wstring2string(L"é”€å”®ä¸­"));
 
-			cout << "ÇëÈ·ÈÏ´ýÌí¼ÓÉÌÆ·µÄÐÅÏ¢£º" << endl << endl;
-			cout << "ÉÌÆ·Ãû³Æ£º" << newCommodity[1] << endl;
-			cout << "ÉÌÆ·¼Û¸ñ£º" << newCommodity[2] << endl;
-			cout << "ÉÌÆ·ÊýÁ¿£º" << newCommodity[3] << endl;
-			wcout << L"ÉÌÆ·ÃèÊö£º" << string2wstring(newCommodity[4]) << endl << endl;
+			cout << "è¯·ç¡®è®¤å¾…æ·»åŠ å•†å“çš„ä¿¡æ¯ï¼š" << endl << endl;
+			cout << "å•†å“åç§°ï¼š" << newCommodity[1] << endl;
+			cout << "å•†å“ä»·æ ¼ï¼š" << newCommodity[2] << endl;
+			cout << "å•†å“æ•°é‡ï¼š" << newCommodity[3] << endl;
+			wcout << L"å•†å“æè¿°ï¼š" << string2wstring(newCommodity[4]) << endl << endl;
 
-			cout << "ÊÇ·ñÌí¼ÓÉÌÆ·£¿ÊäÈë1ÒÔÌí¼Ó£¬ÊäÈëÆäËûÊý×ÖÒÔ·ÅÆúÌí¼Ó" << endl;
+			cout << "æ˜¯å¦æ·»åŠ å•†å“ï¼Ÿè¾“å…¥1ä»¥æ·»åŠ ï¼Œè¾“å…¥å…¶ä»–æ•°å­—ä»¥æ”¾å¼ƒæ·»åŠ " << endl;
 			if (getOperationCode() == 1)
 			{
 				try
@@ -445,23 +445,23 @@ void SellerPage(std::string id)
 					command.pop_back();
 					command += ")";
 					database.perform(command, id, "seller");
-					cout << "Ìí¼Ó³É¹¦" << endl;
+					cout << "æ·»åŠ æˆåŠŸ" << endl;
 				}
 				catch (const std::exception&)
 				{
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 			}
 			else
 			{
-				cout << "·ÅÆúÌí¼Ó" << endl;
+				cout << "æ”¾å¼ƒæ·»åŠ " << endl;
 			}
 
 			break;
 		case 2:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÉÌÆ·ID", "Ãû³Æ", "¼Û¸ñ", "ÊýÁ¿", "ÃèÊö", "Âô¼ÒID", "ÉÏ¼ÜÊ±¼ä", "ÉÌÆ·×´Ì¬");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "å•†å“ID", "åç§°", "ä»·æ ¼", "æ•°é‡", "æè¿°", "å–å®¶ID", "ä¸Šæž¶æ—¶é—´", "å•†å“çŠ¶æ€");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -474,7 +474,7 @@ void SellerPage(std::string id)
 			updateKey = "dont";
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÉÌÆ·ID", "Ãû³Æ", "¼Û¸ñ", "ÊýÁ¿", "ÃèÊö", "Âô¼ÒID", "ÉÏ¼ÜÊ±¼ä", "ÉÌÆ·×´Ì¬");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "å•†å“ID", "åç§°", "ä»·æ ¼", "æ•°é‡", "æè¿°", "å–å®¶ID", "ä¸Šæž¶æ—¶é—´", "å•†å“çŠ¶æ€");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -482,25 +482,25 @@ void SellerPage(std::string id)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
 			}
-			cout << "ÇëÊäÈëÏëÒªÐÞ¸ÄÐÅÏ¢µÄÉÌÆ·µÄÉÌÆ·ID£º";
+			cout << "è¯·è¾“å…¥æƒ³è¦ä¿®æ”¹ä¿¡æ¯çš„å•†å“çš„å•†å“IDï¼š";
 			cin >> itemID;
-			cout << "ÇëÑ¡ÔñÏëÒª±¾´ÎÐÞ¸ÄµÄÐÅÏ¢" << endl;
-			wcout << format(L"\n|{:^38}|{:^38}|{:^38}|{:^38}|\n", L"1.Ãû³Æ", L"2.¼Û¸ñ", L"3.ÊýÁ¿", L"4.ÃèÊö");
+			cout << "è¯·é€‰æ‹©æƒ³è¦æœ¬æ¬¡ä¿®æ”¹çš„ä¿¡æ¯" << endl;
+			wcout << format(L"\n|{:^38}|{:^38}|{:^38}|{:^38}|\n", L"1.åç§°", L"2.ä»·æ ¼", L"3.æ•°é‡", L"4.æè¿°");
 			switch (getOperationCode())
 			{
 			case 1:
-				cout << "ÇëÊäÈëÐÂÃû³Æ£º";
+				cout << "è¯·è¾“å…¥æ–°åç§°ï¼š";
 				wcin >> tmp;
 				if (tmp.length() > 20)
 				{
-					cout << "ÉÌÆ·Ãû³Æ¹ý³¤£¬ÇëÖØÊÔ" << endl;
+					cout << "å•†å“åç§°è¿‡é•¿ï¼Œè¯·é‡è¯•" << endl;
 					break;
 				}
 				updateKey = "name";
 				updateValue = wstring2string(tmp);
 				break;
 			case 2:
-				cout << "ÇëÊäÈëÐÂ¼Û¸ñ£º";
+				cout << "è¯·è¾“å…¥æ–°ä»·æ ¼ï¼š";
 				wcin >> tmp;
 				try
 				{
@@ -508,14 +508,14 @@ void SellerPage(std::string id)
 				}
 				catch (const std::exception&)
 				{
-					cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+					cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 					break;
 				}
 				updateKey = "price";
 				updateValue = format("{:.1f}", stod(tmp));
 				break;
 			case 3:
-				cout << "ÇëÊäÈëÐÂÊýÁ¿£º";
+				cout << "è¯·è¾“å…¥æ–°æ•°é‡ï¼š";
 				wcin >> tmp;
 				try
 				{
@@ -525,18 +525,18 @@ void SellerPage(std::string id)
 				}
 				catch (const std::exception&)
 				{
-					cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+					cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 					break;
 				}
 				updateKey = "count";
 				updateValue = format("{}", stoi(tmp));
 				break;
 			case 4:
-				cout << "ÇëÊäÈëÐÂÃèÊö£º";
+				cout << "è¯·è¾“å…¥æ–°æè¿°ï¼š";
 				wcin >> tmp;
-				tmp = regex_replace(tmp, wregex(L","), L"£¬");
+				tmp = regex_replace(tmp, wregex(L","), L"ï¼Œ");
 				if (tmp.length() > 200) {
-					cout << "²»ÕýÈ·µÄÊäÈë£¬ÇëÖØÊÔ" << endl;
+					cout << "ä¸æ­£ç¡®çš„è¾“å…¥ï¼Œè¯·é‡è¯•" << endl;
 					break;
 				}
 				updateKey = "description";
@@ -551,17 +551,17 @@ void SellerPage(std::string id)
 			{
 				command = format("UPDATE commodity SET {} = {} WHERE itemID = {}", updateKey, updateValue, itemID);
 				database.perform(command, id, "seller");
-				cout << "Ìí¼Ó³É¹¦" << endl;
+				cout << "æ·»åŠ æˆåŠŸ" << endl;
 			}
 			catch (const std::exception&)
 			{
-				cout << "²Ù×÷Î´ÉúÐ§" << endl;
+				cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 			}
 			break;
 		case 4:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÉÌÆ·ID", "Ãû³Æ", "¼Û¸ñ", "ÊýÁ¿", "ÃèÊö", "Âô¼ÒID", "ÉÏ¼ÜÊ±¼ä", "ÉÌÆ·×´Ì¬");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "å•†å“ID", "åç§°", "ä»·æ ¼", "æ•°é‡", "æè¿°", "å–å®¶ID", "ä¸Šæž¶æ—¶é—´", "å•†å“çŠ¶æ€");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -569,15 +569,15 @@ void SellerPage(std::string id)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
 			}
-			cout << "ÇëÊäÈëÏëÒªÏÂ¼ÜµÄÉÌÆ·µÄÉÌÆ·ID£º";
+			cout << "è¯·è¾“å…¥æƒ³è¦ä¸‹æž¶çš„å•†å“çš„å•†å“IDï¼š";
 			cin >> itemID;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"ÏúÊÛÖÐ"; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"é”€å”®ä¸­"; } return true; }), allCommodity.end());
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != string2wstring(itemID); } return true; }), allCommodity.end());
 			if (allCommodity.empty()) {
-				cout << "ÎÞ¿ÉÏÂ¼ÜÉÌÆ·µÄÉÌÆ·IDÎª" << itemID << endl;
+				cout << "æ— å¯ä¸‹æž¶å•†å“çš„å•†å“IDä¸º" << itemID << endl;
 				break;
 			}
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÉÌÆ·ID", "Ãû³Æ", "¼Û¸ñ", "ÊýÁ¿", "ÃèÊö", "Âô¼ÒID", "ÉÏ¼ÜÊ±¼ä", "ÉÌÆ·×´Ì¬");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "å•†å“ID", "åç§°", "ä»·æ ¼", "æ•°é‡", "æè¿°", "å–å®¶ID", "ä¸Šæž¶æ—¶é—´", "å•†å“çŠ¶æ€");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -585,25 +585,25 @@ void SellerPage(std::string id)
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
 			}
-			cout << "ÇëÈ·ÈÏÊÇ·ñÏÂ¼ÜÉÌÆ·£¬ÊäÈë1ÒÔÏÂ¼ÜÉÌÆ·£¬ÊäÈëÆäËûÊý×ÖÈ¡ÏûÏÂ¼Ü\n";
+			cout << "è¯·ç¡®è®¤æ˜¯å¦ä¸‹æž¶å•†å“ï¼Œè¾“å…¥1ä»¥ä¸‹æž¶å•†å“ï¼Œè¾“å…¥å…¶ä»–æ•°å­—å–æ¶ˆä¸‹æž¶\n";
 			if (getOperationCode() == 1) {
 				try
 				{
-					database.perform("UPDATE commodity SET state = ÒÑÏÂ¼Ü WHERE itemID = " + itemID, id, "seller");
-					cout << "ÏÂ¼Ü³É¹¦" << endl;
+					database.perform("UPDATE commodity SET state = å·²ä¸‹æž¶ WHERE itemID = " + itemID, id, "seller");
+					cout << "ä¸‹æž¶æˆåŠŸ" << endl;
 				}
 				catch (const std::exception&)
 				{
-					cout << "²Ù×÷Î´ÉúÐ§" << endl;
+					cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 				}
 			}
 			else
-				cout << "·ÅÆúÏÂ¼ÜÉÌÆ·" << endl;
+				cout << "æ”¾å¼ƒä¸‹æž¶å•†å“" << endl;
 			break;
 		case 5:
 			allOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + id, id, "seller");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "¶©µ¥ID", "ÉÌÆ·ID", "½»Ò×µ¥¼Û", "ÊýÁ¿", "½»Ò×Ê±¼ä", "Âô¼ÒID", "Âò¼ÒID");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "è®¢å•ID", "å•†å“ID", "äº¤æ˜“å•ä»·", "æ•°é‡", "äº¤æ˜“æ—¶é—´", "å–å®¶ID", "ä¹°å®¶ID");
 			for (auto& line : allOrder)
 			{
 				wcout << endl;
@@ -636,12 +636,12 @@ void BuyerPage(std::string id)
 	vector<wstring> titles;
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.²é¿´ÉÌÆ·ÁÐ±í", L"2.¹ºÂòÉÌÆ·", L"3.ËÑË÷ÉÌÆ·", L"4.²é¿´ÀúÊ·¶©µ¥", L"5.²é¿´ÉÌÆ·ÏêÏ¸ÐÅÏ¢", L"6.·µ»ØÉÏ²ã²Ëµ¥");
+		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.æŸ¥çœ‹å•†å“åˆ—è¡¨", L"2.è´­ä¹°å•†å“", L"3.æœç´¢å•†å“", L"4.æŸ¥çœ‹åŽ†å²è®¢å•", L"5.æŸ¥çœ‹å•†å“è¯¦ç»†ä¿¡æ¯", L"6.è¿”å›žä¸Šå±‚èœå•");
 		switch (getOperationCode())
 		{
 		case 1:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"ÏúÊÛÖÐ"), id, "buyer");
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"ÉÌÆ·ID", L"ÉÌÆ·Ãû³Æ", L"¼Û¸ñ", L"ÊýÁ¿", L"Âô¼ÒID", L"ÉÏ¼ÜÊ±¼ä");
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"é”€å”®ä¸­"), id, "buyer");
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"å•†å“ID", L"å•†å“åç§°", L"ä»·æ ¼", L"æ•°é‡", L"å–å®¶ID", L"ä¸Šæž¶æ—¶é—´");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -654,20 +654,20 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 2:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"ÏúÊÛÖÐ"), id, "buyer");
-			cout << "ÇëÊäÈëÉÌÆ·ID£º";
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"é”€å”®ä¸­"), id, "buyer");
+			cout << "è¯·è¾“å…¥å•†å“IDï¼š";
 			wcin >> itemID;
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return true; }), allCommodity.end());
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "ÉÌÆ·²»´æÔÚ»ò²»¿É¹ºÂò" << endl;
+				cout << "å•†å“ä¸å­˜åœ¨æˆ–ä¸å¯è´­ä¹°" << endl;
 				break;
 			}
-			cout << "ÇëÊäÈë¹ºÂòÊýÁ¿£º";
+			cout << "è¯·è¾“å…¥è´­ä¹°æ•°é‡ï¼š";
 			cin >> count;
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [count](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "count") return stoi(j.second) < count; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "ÉÌÆ·ÊýÁ¿²»×ã£¬ÎÞ·¨¹ºÂò" << endl;
+				cout << "å•†å“æ•°é‡ä¸è¶³ï¼Œæ— æ³•è´­ä¹°" << endl;
 				break;
 			}
 			for (auto& i : allCommodity.front())
@@ -678,13 +678,13 @@ void BuyerPage(std::string id)
 				else if (i.first == "sellerID")
 					sellerID = wstring2string(i.second);
 			if (stod(calculateWallet(id)) < price * count) {
-				cout << "Óà¶î²»×ã£¬ÎÞ·¨¹ºÂò" << endl;
+				cout << "ä½™é¢ä¸è¶³ï¼Œæ— æ³•è´­ä¹°" << endl;
 				break;
 			}
 			try
 			{
 				if (count == availableCount)
-					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"ÒÑÏÂ¼Ü") + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
+					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"å·²ä¸‹æž¶") + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
 				else
 					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
 				allOrder = database.perform("SELECT * FROM order", id, "buyer");
@@ -703,14 +703,14 @@ void BuyerPage(std::string id)
 			}
 			catch (const std::exception&)
 			{
-				cout << "²Ù×÷Î´ÉúÐ§" << endl;
+				cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 			}
 			break;
 		case 3:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"ÏúÊÛÖÐ"), id, "buyer");
-			cout << "ÇëÊäÈë¹Ø¼ü×Ö£º";
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"é”€å”®ä¸­"), id, "buyer");
+			cout << "è¯·è¾“å…¥å…³é”®å­—ï¼š";
 			wcin >> keyword;
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"ÉÌÆ·ID", L"ÉÌÆ·Ãû³Æ", L"¼Û¸ñ", L"ÊýÁ¿", L"Âô¼ÒID", L"ÉÏ¼ÜÊ±¼ä");
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"å•†å“ID", L"å•†å“åç§°", L"ä»·æ ¼", L"æ•°é‡", L"å–å®¶ID", L"ä¸Šæž¶æ—¶é—´");
 			for (auto& line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> >& i) {for (auto& j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
 				wcout << endl;
 				for (auto& i : line)
@@ -724,7 +724,7 @@ void BuyerPage(std::string id)
 		case 4:
 			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id, id, "buyer");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "¶©µ¥ID", "ÉÌÆ·ID", "½»Ò×µ¥¼Û", "ÊýÁ¿", "½»Ò×Ê±¼ä", "Âô¼ÒID", "Âò¼ÒID");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "è®¢å•ID", "å•†å“ID", "äº¤æ˜“å•ä»·", "æ•°é‡", "äº¤æ˜“æ—¶é—´", "å–å®¶ID", "ä¹°å®¶ID");
 			for (auto& line : allOrder)
 			{
 				wcout << endl;
@@ -734,8 +734,8 @@ void BuyerPage(std::string id)
 			}
 			break;
 		case 5:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"ÏúÊÛÖÐ"), id, "buyer");
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"ÉÌÆ·ID", L"ÉÌÆ·Ãû³Æ", L"¼Û¸ñ", L"ÊýÁ¿", L"Âô¼ÒID", L"ÉÏ¼ÜÊ±¼ä");
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"é”€å”®ä¸­"), id, "buyer");
+			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"å•†å“ID", L"å•†å“åç§°", L"ä»·æ ¼", L"æ•°é‡", L"å–å®¶ID", L"ä¸Šæž¶æ—¶é—´");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -746,17 +746,17 @@ void BuyerPage(std::string id)
 						wcout << format(L"|{:^25}", i.second);
 				wcout << "|\n";
 			}
-			cout << "ÇëÊäÈëÏëÒª²é¿´µÄÉÌÆ·ID£º";
+			cout << "è¯·è¾“å…¥æƒ³è¦æŸ¥çœ‹çš„å•†å“IDï¼š";
 			wcin >> itemID;
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "ÉÌÆ·²»´æÔÚ»ò²»¿É¹ºÂò" << endl;
+				cout << "å•†å“ä¸å­˜åœ¨æˆ–ä¸å¯è´­ä¹°" << endl;
 				break;
 			}
-			titles = { L"ÉÌÆ·ID", L"ÉÌÆ·Ãû³Æ", L"¼Û¸ñ", L"ÊýÁ¿", L"ÃèÊö", L"Âô¼ÒID", L"ÉÏ¼ÜÊ±¼ä", L"ÏúÊÛ×´Ì¬" };
+			titles = { L"å•†å“ID", L"å•†å“åç§°", L"ä»·æ ¼", L"æ•°é‡", L"æè¿°", L"å–å®¶ID", L"ä¸Šæž¶æ—¶é—´", L"é”€å”®çŠ¶æ€" };
 			cout << endl;
 			for (auto& i : allCommodity.front())
-				wcout << titles.front() << L"£º" << i.second << endl, titles.erase(titles.begin());
+				wcout << titles.front() << L"ï¼š" << i.second << endl, titles.erase(titles.begin());
 			cout << endl;
 			break;
 		case 6:
@@ -861,10 +861,10 @@ void SignUp()
 	}
 
 	wstring tmp;
-	cout << "ÇëÊäÈëÓÃ»§Ãû£º";
+	cout << "è¯·è¾“å…¥ç”¨æˆ·åï¼š";
 	wcin >> tmp;
 	if (tmp.length() > 10) {
-		cout << "ÓÃ»§Ãû¹ý³¤" << endl;
+		cout << "ç”¨æˆ·åè¿‡é•¿" << endl;
 		return;
 	}
 	auto nameFound = false;
@@ -873,61 +873,61 @@ void SignUp()
 			if (j.first == "name")
 				nameFound = nameFound or j.second == tmp;
 	if (nameFound) {
-		cout << "¸ÃÓÃ»§ÃûÒÑ±»×¢²á" << endl;
+		cout << "è¯¥ç”¨æˆ·åå·²è¢«æ³¨å†Œ" << endl;
 		return;
 	}
 	newUser.push_back(wstring2string(tmp));
 
-	cout << "ÇëÊäÈëÃÜÂë£º";
+	cout << "è¯·è¾“å…¥å¯†ç ï¼š";
 	wcin >> tmp;
 	if (tmp.size() > 20) {
-		cout << "ÃÜÂë¹ý³¤" << endl;
+		cout << "å¯†ç è¿‡é•¿" << endl;
 		return;
 	}
 	for (auto& i : tmp) {
 		if (!isdigit(i) and !islower(i))
 		{
-			cout << "ÃÜÂë½öÔÊÐíÓÉÐ¡Ð´×ÖÄ¸ºÍÊý×Ö×é³É" << endl;
+			cout << "å¯†ç ä»…å…è®¸ç”±å°å†™å­—æ¯å’Œæ•°å­—ç»„æˆ" << endl;
 			return;
 		}
 	}
 	newUser.push_back(wstring2string(tmp));
 	
-	cout << "ÇëÊäÈëÁªÏµ·½Ê½£º";
+	cout << "è¯·è¾“å…¥è”ç³»æ–¹å¼ï¼š";
 	wcin >> tmp;
 	if (tmp.size() > 20) {
-		cout << "ÁªÏµ·½Ê½¹ý³¤" << endl;
+		cout << "è”ç³»æ–¹å¼è¿‡é•¿" << endl;
 		return;
 	}
 	for (auto& i : tmp) {
 		if (!isdigit(i))
 		{
-			cout << "ÁªÏµ·½Ê½½öÔÊÐíÓÉÊý×Ö×é³É" << endl;
+			cout << "è”ç³»æ–¹å¼ä»…å…è®¸ç”±æ•°å­—ç»„æˆ" << endl;
 			return;
 		}
 	}
 	newUser.push_back(wstring2string(tmp));
 
-	cout << "ÇëÊäÈëÁªÂçµØÖ·£º";
+	cout << "è¯·è¾“å…¥è”ç»œåœ°å€ï¼š";
 	wcin >> tmp;
 	if (tmp.size() > 40) {
-		cout << "ÁªÂçµØÖ·¹ý³¤" << endl;
+		cout << "è”ç»œåœ°å€è¿‡é•¿" << endl;
 		return;
 	}
 	newUser.push_back(wstring2string(tmp));
 
 	newUser.push_back("0.0");
 
-	newUser.push_back(wstring2string(L"Õý³£"));
+	newUser.push_back(wstring2string(L"æ­£å¸¸"));
 
-	cout << "ÇëÈ·ÈÏ×¢²áÐÅÏ¢£º" << endl << endl;
-	wcout << L"ÓÃ»§Ãû£º" << string2wstring(newUser[1]) << endl;
-	wcout << L"ÃÜÂë£º" << string2wstring(newUser[2]) << endl;
-	wcout << L"ÁªÏµ·½Ê½£º" << string2wstring(newUser[3]) << endl;
-	wcout << L"ÁªÂçµØÖ·£º" << string2wstring(newUser[4]) << endl;
+	cout << "è¯·ç¡®è®¤æ³¨å†Œä¿¡æ¯ï¼š" << endl << endl;
+	wcout << L"ç”¨æˆ·åï¼š" << string2wstring(newUser[1]) << endl;
+	wcout << L"å¯†ç ï¼š" << string2wstring(newUser[2]) << endl;
+	wcout << L"è”ç³»æ–¹å¼ï¼š" << string2wstring(newUser[3]) << endl;
+	wcout << L"è”ç»œåœ°å€ï¼š" << string2wstring(newUser[4]) << endl;
 	cout << endl;
 
-	cout << "ÊäÈë1ÒÔÈ·ÈÏ×¢²á£¬ÊäÈëÆäËûÊý×ÖÈ¡Ïû×¢²á" << endl;
+	cout << "è¾“å…¥1ä»¥ç¡®è®¤æ³¨å†Œï¼Œè¾“å…¥å…¶ä»–æ•°å­—å–æ¶ˆæ³¨å†Œ" << endl;
 	if (getOperationCode() == 1) {
 		try
 		{
@@ -937,14 +937,14 @@ void SignUp()
 			command.pop_back();
 			command += ")";
 			database.perform(command, "admin", "123456");
-			cout << "×¢²á³É¹¦£¬·µ»ØÉÏ²ãÒ³Ãæ" << endl;
+			cout << "æ³¨å†ŒæˆåŠŸï¼Œè¿”å›žä¸Šå±‚é¡µé¢" << endl;
 		}
 		catch (const std::exception&)
 		{
-			cout << "²Ù×÷Î´ÉúÐ§" << endl;
+			cout << "æ“ä½œæœªç”Ÿæ•ˆ" << endl;
 		}
 	}
 	else {
-		cout << "·ÅÆú×¢²á" << endl;
+		cout << "æ”¾å¼ƒæ³¨å†Œ" << endl;
 	}
 }

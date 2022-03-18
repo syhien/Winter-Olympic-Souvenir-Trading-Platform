@@ -14,7 +14,7 @@ int getOperationCode()
 {
 	std::string codeString;
 	int codeInt;
-	std::cout << "ÊäÈë²Ù×÷£º";
+	std::cout << "è¾“å…¥æ“ä½œï¼š";
 	std::cin >> codeString;
 	try
 	{
@@ -22,7 +22,7 @@ int getOperationCode()
 	}
 	catch (const std::exception&)
 	{
-		std::cout << "²»ÕýÈ·µÄÊäÈë\n";
+		std::cout << "ä¸æ­£ç¡®çš„è¾“å…¥\n";
 		codeInt = getOperationCode();
 	}
 	return codeInt;
@@ -41,13 +41,13 @@ std::string getCurrentTime()
 string wstring2string(wstring wstr)
 {
 	string result;
-	//»ñÈ¡»º³åÇø´óÐ¡£¬²¢ÉêÇë¿Õ¼ä£¬»º³åÇø´óÐ¡ÊÂ°´×Ö½Ú¼ÆËãµÄ  
+	//èŽ·å–ç¼“å†²åŒºå¤§å°ï¼Œå¹¶ç”³è¯·ç©ºé—´ï¼Œç¼“å†²åŒºå¤§å°äº‹æŒ‰å­—èŠ‚è®¡ç®—çš„  
 	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
 	char* buffer = new char[len + 1];
-	//¿í×Ö½Ú±àÂë×ª»»³É¶à×Ö½Ú±àÂë  
+	//å®½å­—èŠ‚ç¼–ç è½¬æ¢æˆå¤šå­—èŠ‚ç¼–ç   
 	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
 	buffer[len] = '\0';
-	//É¾³ý»º³åÇø²¢·µ»ØÖµ  
+	//åˆ é™¤ç¼“å†²åŒºå¹¶è¿”å›žå€¼  
 	result.append(buffer);
 	delete[] buffer;
 	return result;

@@ -20,7 +20,7 @@ void Administator::HomePage()
 {
 	bool login = true;
 	while (login) {
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.…Ã∆∑≤Ÿ◊˜", L"2.∂©µ•≤Ÿ◊˜", L"3.”√ªß≤Ÿ◊˜", L"4.µ«≥ˆ");
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.ÂïÜÂìÅÊìç‰Ωú", L"2.ËÆ¢ÂçïÊìç‰Ωú", L"3.Áî®Êà∑Êìç‰Ωú", L"4.ÁôªÂá∫");
 		auto operationCode = getOperationCode();
 		switch (operationCode)
 		{
@@ -34,11 +34,11 @@ void Administator::HomePage()
 			__handleUserPage();
 			break;
 		case 4:
-			cout << "π‹¿Ì‘±µ«≥ˆ\n";
+			cout << "ÁÆ°ÁêÜÂëòÁôªÂá∫\n";
 			login = false;
 			break;
 		default:
-			cout << "Œﬁ¥À≤Ÿ◊˜\n";
+			cout << "Êó†Ê≠§Êìç‰Ωú\n";
 			break;
 		}
 	}
@@ -52,13 +52,13 @@ void Administator::__handleCommodityPage()
 	int tmpInt;
 	wstring keyword;
 	while (keepHere) {
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.≤Èø¥À˘”–…Ã∆∑", L"2.ºÏÀ˜…Ã∆∑", L"3.œ¬º‹…Ã∆∑", L"4.∑µªÿ…œ≤„≤Àµ•");
+		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.Êü•ÁúãÊâÄÊúâÂïÜÂìÅ", L"2.Ê£ÄÁ¥¢ÂïÜÂìÅ", L"3.‰∏ãÊû∂ÂïÜÂìÅ", L"4.ËøîÂõû‰∏äÂ±ÇËèúÂçï");
 		auto operationCode = getOperationCode();
 		allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "…Ã∆∑ID", "√˚≥∆", "º€∏Ò", " ˝¡ø", "√Ë ˆ", "¬Ùº“ID", "…œº‹ ±º‰", "…Ã∆∑◊¥Ã¨");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÂïÜÂìÅID", "ÂêçÁß∞", "‰ª∑Ê†º", "Êï∞Èáè", "ÊèèËø∞", "ÂçñÂÆ∂ID", "‰∏äÊû∂Êó∂Èó¥", "ÂïÜÂìÅÁä∂ÊÄÅ");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -68,9 +68,9 @@ void Administator::__handleCommodityPage()
 			}
 			break;
 		case 2:
-			cout << "«Î ‰»Îπÿº¸¥ £∫";
+			cout << "ËØ∑ËæìÂÖ•ÂÖ≥ÈîÆËØçÔºö";
 			wcin >> keyword;
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "…Ã∆∑ID", "√˚≥∆", "º€∏Ò", " ˝¡ø", "√Ë ˆ", "¬Ùº“ID", "…œº‹ ±º‰", "…Ã∆∑◊¥Ã¨");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÂïÜÂìÅID", "ÂêçÁß∞", "‰ª∑Ê†º", "Êï∞Èáè", "ÊèèËø∞", "ÂçñÂÆ∂ID", "‰∏äÊû∂Êó∂Èó¥", "ÂïÜÂìÅÁä∂ÊÄÅ");
 			for (auto line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
 				wcout << endl;
 				for (auto& i : line)
@@ -79,7 +79,7 @@ void Administator::__handleCommodityPage()
 			}
 			break;
 		case 3:
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "…Ã∆∑ID", "√˚≥∆", "º€∏Ò", " ˝¡ø", "√Ë ˆ", "¬Ùº“ID", "…œº‹ ±º‰", "…Ã∆∑◊¥Ã¨");
+			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÂïÜÂìÅID", "ÂêçÁß∞", "‰ª∑Ê†º", "Êï∞Èáè", "ÊèèËø∞", "ÂçñÂÆ∂ID", "‰∏äÊû∂Êó∂Èó¥", "ÂïÜÂìÅÁä∂ÊÄÅ");
 			for (auto& line : allCommodity)
 			{
 				wcout << endl;
@@ -87,12 +87,12 @@ void Administator::__handleCommodityPage()
 					wcout << format(L"|{:^19}", i.second);
 				wcout << "|\n";
 			}
-			cout << "«Î ‰»Î¥˝œ¬º‹µƒ…Ã∆∑µƒ…Ã∆∑ID£∫";
+			cout << "ËØ∑ËæìÂÖ•ÂæÖ‰∏ãÊû∂ÁöÑÂïÜÂìÅÁöÑÂïÜÂìÅIDÔºö";
 			wcin >> keyword;
 			try
 			{
 				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE itemID CONTAINS " + wstring2string(keyword), "admin", "123456");
-				cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "…Ã∆∑ID", "√˚≥∆", "º€∏Ò", " ˝¡ø", "√Ë ˆ", "¬Ùº“ID", "…œº‹ ±º‰", "…Ã∆∑◊¥Ã¨");
+				cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "ÂïÜÂìÅID", "ÂêçÁß∞", "‰ª∑Ê†º", "Êï∞Èáè", "ÊèèËø∞", "ÂçñÂÆ∂ID", "‰∏äÊû∂Êó∂Èó¥", "ÂïÜÂìÅÁä∂ÊÄÅ");
 				for (auto& line : selectedCommodity)
 				{
 					wcout << endl;
@@ -100,19 +100,19 @@ void Administator::__handleCommodityPage()
 						wcout << format(L"|{:^19}", i.second);
 					wcout << "|\n";
 				}
-				cout << "«Î»∑»œ «∑Òœ¬º‹…Ã∆∑£¨ ‰»Î1“‘œ¬º‹…Ã∆∑£¨ ‰»Î∆‰À˚ ˝◊÷»°œ˚œ¬º‹\n";
+				cout << "ËØ∑Á°ÆËÆ§ÊòØÂê¶‰∏ãÊû∂ÂïÜÂìÅÔºåËæìÂÖ•1‰ª•‰∏ãÊû∂ÂïÜÂìÅÔºåËæìÂÖ•ÂÖ∂‰ªñÊï∞Â≠óÂèñÊ∂à‰∏ãÊû∂\n";
 				tmpInt = getOperationCode();
 				if (tmpInt != 1) {
-					cout << "“—»°œ˚œ¬º‹" << endl;
+					cout << "Â∑≤ÂèñÊ∂à‰∏ãÊû∂" << endl;
 					break;
 				}
-				__database->perform("UPDATE commodity SET state = “—œ¬º‹ WHERE itemID = " + wstring2string(keyword), "admin", "123456");
-				cout << "œ¬º‹≥…π¶\n";
+				__database->perform("UPDATE commodity SET state = Â∑≤‰∏ãÊû∂ WHERE itemID = " + wstring2string(keyword), "admin", "123456");
+				cout << "‰∏ãÊû∂ÊàêÂäü\n";
 			}
 			catch (const std::exception& e)
 			{
 				cout << e.what() << endl;
-				cout << "≤Ÿ◊˜Œ¥…˙–ß\n";
+				cout << "Êìç‰ΩúÊú™ÁîüÊïà\n";
 			}
 			break;
 		case 4:
@@ -130,13 +130,13 @@ void Administator::__handleOrderPage()
 	auto allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 	wstring keyword;
 	while (keepHere) {
-		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.≤Èø¥À˘”–∂©µ•", L"2.ºÏÀ˜∂©µ•", L"3.∑µªÿ…œ≤„≤Àµ•");
+		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.Êü•ÁúãÊâÄÊúâËÆ¢Âçï", L"2.Ê£ÄÁ¥¢ËÆ¢Âçï", L"3.ËøîÂõû‰∏äÂ±ÇËèúÂçï");
 		auto operationCode = getOperationCode();
 		allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "∂©µ•ID", "…Ã∆∑ID", "Ωª“◊µ•º€", " ˝¡ø", "Ωª“◊ ±º‰", "¬Ùº“ID", "¬Úº“ID");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "ËÆ¢ÂçïID", "ÂïÜÂìÅID", "‰∫§ÊòìÂçï‰ª∑", "Êï∞Èáè", "‰∫§ÊòìÊó∂Èó¥", "ÂçñÂÆ∂ID", "‰π∞ÂÆ∂ID");
 			for (auto& line : allOrder)
 			{
 				wcout << endl;
@@ -146,9 +146,9 @@ void Administator::__handleOrderPage()
 			}
 			break;
 		case 2:
-			cout << "«Î ‰»Îπÿº¸¥ £∫";
+			cout << "ËØ∑ËæìÂÖ•ÂÖ≥ÈîÆËØçÔºö";
 			wcin >> keyword;
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "∂©µ•ID", "…Ã∆∑ID", "Ωª“◊µ•º€", " ˝¡ø", "Ωª“◊ ±º‰", "¬Ùº“ID", "¬Úº“ID");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "ËÆ¢ÂçïID", "ÂïÜÂìÅID", "‰∫§ÊòìÂçï‰ª∑", "Êï∞Èáè", "‰∫§ÊòìÊó∂Èó¥", "ÂçñÂÆ∂ID", "‰π∞ÂÆ∂ID");
 			for (auto line : allOrder | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
 				wcout << endl;
 				for (auto& i : line)
@@ -173,13 +173,13 @@ void Administator::__handleUserPage()
 	wstring keyword;
 	int tmpInt;
 	while (keepHere) {
-		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.≤Èø¥À˘”–”√ªß", L"2.∑‚Ω˚”√ªß", L"3.∑µªÿ…œ≤„≤Àµ•");
+		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.Êü•ÁúãÊâÄÊúâÁî®Êà∑", L"2.Â∞ÅÁ¶ÅÁî®Êà∑", L"3.ËøîÂõû‰∏äÂ±ÇËèúÂçï");
 		auto operationCode = getOperationCode();
 		allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "”√ªßID", "”√ªß√˚", "√‹¬Î", "¡™œµ∑Ω Ω", "µÿ÷∑", "«Æ∞¸”‡∂Ó", "”√ªß◊¥Ã¨");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "Áî®Êà∑ID", "Áî®Êà∑Âêç", "ÂØÜÁ†Å", "ËÅîÁ≥ªÊñπÂºè", "Âú∞ÂùÄ", "Èí±ÂåÖ‰ΩôÈ¢ù", "Áî®Êà∑Áä∂ÊÄÅ");
 			for (auto& line : allUser)
 			{
 				wcout << endl;
@@ -189,7 +189,7 @@ void Administator::__handleUserPage()
 			}
 			break;
 		case 2:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "”√ªßID", "”√ªß√˚", "√‹¬Î", "¡™œµ∑Ω Ω", "µÿ÷∑", "«Æ∞¸”‡∂Ó", "”√ªß◊¥Ã¨");
+			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "Áî®Êà∑ID", "Áî®Êà∑Âêç", "ÂØÜÁ†Å", "ËÅîÁ≥ªÊñπÂºè", "Âú∞ÂùÄ", "Èí±ÂåÖ‰ΩôÈ¢ù", "Áî®Êà∑Áä∂ÊÄÅ");
 			for (auto& line : allUser)
 			{
 				wcout << endl;
@@ -197,12 +197,12 @@ void Administator::__handleUserPage()
 					wcout << format(L"|{:^21}", i.second);
 				wcout << "|\n";
 			}
-			cout << "«Î ‰»Î¥˝∑‚Ω˚µƒ”√ªßµƒ”√ªßID£∫";
+			cout << "ËØ∑ËæìÂÖ•ÂæÖÂ∞ÅÁ¶ÅÁöÑÁî®Êà∑ÁöÑÁî®Êà∑IDÔºö";
 			wcin >> keyword;
 			try
 			{
 				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + wstring2string(keyword), "admin", "123456");
-				cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "”√ªßID", "”√ªß√˚", "√‹¬Î", "¡™œµ∑Ω Ω", "µÿ÷∑", "«Æ∞¸”‡∂Ó", "”√ªß◊¥Ã¨");
+				cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "Áî®Êà∑ID", "Áî®Êà∑Âêç", "ÂØÜÁ†Å", "ËÅîÁ≥ªÊñπÂºè", "Âú∞ÂùÄ", "Èí±ÂåÖ‰ΩôÈ¢ù", "Áî®Êà∑Áä∂ÊÄÅ");
 				for (auto& line : selectedUser)
 				{
 					wcout << endl;
@@ -210,19 +210,19 @@ void Administator::__handleUserPage()
 						wcout << format(L"|{:^21}", i.second);
 					wcout << "|\n";
 				}
-				cout << "«Î»∑»œ «∑Ò∑‚Ω˚”√ªß£¨ ‰»Î1“‘∑‚Ω˚”√ªß£¨ ‰»Î∆‰À˚ ˝◊÷»°œ˚∑‚Ω˚\n";
+				cout << "ËØ∑Á°ÆËÆ§ÊòØÂê¶Â∞ÅÁ¶ÅÁî®Êà∑ÔºåËæìÂÖ•1‰ª•Â∞ÅÁ¶ÅÁî®Êà∑ÔºåËæìÂÖ•ÂÖ∂‰ªñÊï∞Â≠óÂèñÊ∂àÂ∞ÅÁ¶Å\n";
 				tmpInt = getOperationCode();
 				if (tmpInt != 1) {
-					cout << "“—»°œ˚∑‚Ω˚" << endl;
+					cout << "Â∑≤ÂèñÊ∂àÂ∞ÅÁ¶Å" << endl;
 					break;
 				}
-				__database->perform("UPDATE user SET state = ∑‚Ω˚ WHERE userID = " + wstring2string(keyword), "admin", "123456");
-				cout << "∑‚Ω˚≥…π¶\n";
+				__database->perform("UPDATE user SET state = Â∞ÅÁ¶Å WHERE userID = " + wstring2string(keyword), "admin", "123456");
+				cout << "Â∞ÅÁ¶ÅÊàêÂäü\n";
 			}
 			catch (const std::exception& e)
 			{
 				cout << e.what() << endl;
-				cout << "≤Ÿ◊˜Œ¥…˙–ß\n";
+				cout << "Êìç‰ΩúÊú™ÁîüÊïà\n";
 			}
 
 			break;

@@ -263,7 +263,7 @@ void Database::__saveCommand(std::string command)
 void Database::__save()
 {
 	setlocale(LC_ALL, "chs");
-	map<string, wstring> tableTitle = { {"commodity",L"ÉÌÆ·ID,Ãû³Æ,¼Û¸ñ,ÊıÁ¿,ÃèÊö,Âô¼ÒID,ÉÏ¼ÜÊ±¼ä,ÉÌÆ·×´Ì¬"},{"order",L"¶©µ¥ID,ÉÌÆ·ID,½»Ò×µ¥¼Û,ÊıÁ¿,½»Ò×Ê±¼ä,Âô¼ÒID,Âò¼ÒID"},{"user",L"ÓÃ»§ID,ÓÃ»§Ãû,ÃÜÂë,ÁªÏµ·½Ê½,µØÖ·,Ç®°üÓà¶î,ÓÃ»§×´Ì¬"},{"recharge",L"ÓÃ»§ID,³äÖµ½ğ¶î,³äÖµÊ±¼ä"} };
+	map<string, wstring> tableTitle = { {"commodity",L"å•†å“ID,åç§°,ä»·æ ¼,æ•°é‡,æè¿°,å–å®¶ID,ä¸Šæ¶æ—¶é—´,å•†å“çŠ¶æ€"},{"order",L"è®¢å•ID,å•†å“ID,äº¤æ˜“å•ä»·,æ•°é‡,äº¤æ˜“æ—¶é—´,å–å®¶ID,ä¹°å®¶ID"},{"user",L"ç”¨æˆ·ID,ç”¨æˆ·å,å¯†ç ,è”ç³»æ–¹å¼,åœ°å€,é’±åŒ…ä½™é¢,ç”¨æˆ·çŠ¶æ€"},{"recharge",L"ç”¨æˆ·ID,å……å€¼é‡‘é¢,å……å€¼æ—¶é—´"} };
 	for (auto& i : __tableFiles) {
 		if (i.first == "commands")
 			continue;
