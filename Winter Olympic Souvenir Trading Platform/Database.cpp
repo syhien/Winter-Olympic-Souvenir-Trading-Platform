@@ -1,4 +1,4 @@
-#include "Database.h"
+﻿#include "Database.h"
 #include <algorithm>
 #include <vector>
 #include <cstdio>
@@ -12,7 +12,6 @@
 #include <iomanip>
 #include <ctime>
 #include <ranges>
-#include <Windows.h>
 #include "terminal.h"
 #pragma warning(disable:4996)
 using namespace std;

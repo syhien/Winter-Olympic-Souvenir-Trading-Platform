@@ -1,4 +1,4 @@
-#include "terminal.h"
+﻿#include "terminal.h"
 #include <string>
 #include <format>
 #include <vector>
@@ -6,7 +6,8 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
-#include <Windows.h>
+#include <locale>
+#include <codecvt>
 #pragma warning(disable:4996)
 using namespace std;
 
@@ -38,29 +39,17 @@ std::string getCurrentTime()
 	return time;
 }
 
-string wstring2string(wstring wstr)
+string wstring2string(const std::wstring& wstr)
 {
-	string result;
-	//获取缓冲区大小，并申请空间，缓冲区大小事按字节计算的  
-	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
-	char* buffer = new char[len + 1];
-	//宽字节编码转换成多字节编码  
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
-	buffer[len] = '\0';
-	//删除缓冲区并返回值  
-	result.append(buffer);
-	delete[] buffer;
-	return result;
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
 }
 
-wstring string2wstring(string str)
+wstring string2wstring(const std::string& str)
 {
-	wstring result;
-	int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
-	TCHAR* buffer = new TCHAR[len + 1];
-	MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
-	buffer[len] = '\0';
-	result.append(buffer);
-	delete[] buffer;
-	return result;
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+	return converterX.from_bytes(str);
 }

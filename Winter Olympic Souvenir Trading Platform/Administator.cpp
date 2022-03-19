@@ -1,9 +1,8 @@
-#include "Administator.h"
+﻿#include "Administator.h"
 #include "terminal.h"
 #include <format>
 #include <ranges>
 #include "terminal.h"
-#include <Windows.h>
 using namespace std;
 
 Administator::Administator(Database* database)

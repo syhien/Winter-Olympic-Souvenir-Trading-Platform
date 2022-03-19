@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include "main.h"
 #include "Administator.h"
@@ -9,7 +9,6 @@
 #include "Calculator.h"
 #include <format>
 #include <ranges>
-#include <Windows.h>
 #include <ctype.h>
 #include <regex>
 #include <queue>
