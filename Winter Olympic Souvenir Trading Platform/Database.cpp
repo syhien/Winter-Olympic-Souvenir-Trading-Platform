@@ -7,7 +7,6 @@
 #include <cassert>
 #include <sstream>
 #include <fstream>
-#include <codecvt>
 #include <typeinfo>
 #include <iomanip>
 #include <ctime>
@@ -20,10 +19,9 @@ using namespace std;
 Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 {
 	__tableFiles = inputFiles;
-	setlocale(LC_ALL, "chs");
-	__columnOfTable["commodity"] = { "itemID", "name","price","count","description", "sellerID", "time", "state" };
-	__columnOfTable["order"] = { "orderID","itemID","price","count", "time", "sellerID", "buyerID" };
-	__columnOfTable["user"] = { "userID", "name","password","contact","address","wallet","state" };
+	__columnOfTable["commodity"] = { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" };
+	__columnOfTable["order"] = { "orderID","commodityID","unitPrice","number", "date", "sellerID", "buyerID" };
+	__columnOfTable["user"] = { "userID", "username","password","phoneNumber","address","balance","userState" };
 	__columnOfTable["recharge"] = { "userID","money","date" };
 	for (auto& i : inputFiles) {
 		if (i.first == "commands")
@@ -32,18 +30,17 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		auto tablePath = i.second;
 		try
 		{
-			wifstream fin(tablePath, ios::in);
-			fin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+			ifstream fin(tablePath, ios::in);
 			if (!fin)
 				throw exception("No selected file.");
-			wstring line;
+			string line;
 			getline(fin, line);
 			while (getline(fin, line)) {
-				wistringstream lineStream(line);
-				wstring tmpValue;
+				istringstream lineStream(line);
+				string tmpValue;
 				int count = 0;
-				std::vector<std::pair<std::string, std::wstring> > newLine;
-				while (getline(lineStream, tmpValue, L',')) {
+				std::vector<std::pair<std::string, std::string> > newLine;
+				while (getline(lineStream, tmpValue, ',')) {
 					newLine.push_back({ __columnOfTable[tableName][count],tmpValue });
 					count++;
 				}
@@ -53,32 +50,32 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		}
 		catch (const std::exception&)
 		{
-			__table[tableName] = std::vector<std::vector<std::pair<std::string, std::wstring> > >();
+			__table[tableName] = std::vector<std::vector<std::pair<std::string, std::string> > >();
 		}
 	}
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::perform(std::string command, std::string sender, std::string mode)
+std::vector<std::vector<std::pair<std::string, std::string>>> Database::perform(std::string command, std::string sender, std::string mode)
 {
 	auto result = __perform(command);
 	if (sender == "admin" and mode == "123456")
 		return result;
 	if (mode == "seller") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != sender; } return true; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return string2string(j.second) != sender; } return true; }), result.end());
 		return result;
 	}
 	if (mode == "buyer") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != sender; } return false; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return string2string(j.second) != sender; } return false; }), result.end());
 		return result;
 	}
 	if (mode == "user") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "userID") return wstring2string(j.second) != sender; } return true; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "userID") return string2string(j.second) != sender; } return true; }), result.end());
 		return result;
 	}
-	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	return std::vector<std::vector<std::pair<std::string, std::string>>>();
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__perform(std::string command)
+std::vector<std::vector<std::pair<std::string, std::string> > > Database::__perform(std::string command)
 {
 	__saveCommand(command);
 	istringstream commandStream(command);
@@ -96,7 +93,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__per
 	else {
 		throw exception("No selected command.");
 	}
-	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
+	return std::vector<std::vector<std::pair<std::string, std::string> > >();
 }
 
 Database::~Database()
@@ -104,7 +101,7 @@ Database::~Database()
 	__save();
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__select(std::istringstream& stream)
+std::vector<std::vector<std::pair<std::string, std::string> > > Database::__select(std::istringstream& stream)
 {
 	string assertString;
 	stream >> assertString;
@@ -136,10 +133,10 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 		if ((stream >> assertString) and !assertString.empty()) {
 			throw exception("Wrong command format.");
 		}
-		std::vector<std::vector<std::pair<std::string, std::wstring> > > result;
+		std::vector<std::vector<std::pair<std::string, std::string> > > result;
 		for (auto i : __table[tableName]) {
-			for (auto j : i | views::filter([column](pair<string, wstring> k) {return k.first == column; })) {
-				if (j.second.find(string2wstring(value)) != wstring::npos)
+			for (auto j : i | views::filter([column](pair<string, string> k) {return k.first == column; })) {
+				if (j.second.find(string2string(value)) != string::npos)
 					result.push_back(i);
 			}
 		}
@@ -148,10 +145,10 @@ std::vector<std::vector<std::pair<std::string, std::wstring> > > Database::__sel
 	else {
 		throw exception("Wrong command format.");
 	}
-	return std::vector<std::vector<std::pair<std::string, std::wstring> > >();
+	return std::vector<std::vector<std::pair<std::string, std::string> > >();
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__insert(std::istringstream& stream)
+std::vector<std::vector<std::pair<std::string, std::string>>> Database::__insert(std::istringstream& stream)
 {
 	string assertString;
 	stream >> assertString;
@@ -179,21 +176,21 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__inser
 	}
 	line.pop_back();
 	istringstream lineStream(line);
-	std::vector<std::pair<std::string, std::wstring>> newLine;
+	std::vector<std::pair<std::string, std::string>> newLine;
 	for (auto& i : __columnOfTable[tableName]) {
 		string newValue;
 		getline(lineStream, newValue, ',');
 		if (newValue.empty()) {
 			throw exception("Wrong command format.");
 		}
-		newLine.push_back({ i,string2wstring(newValue) });
+		newLine.push_back({ i,string2string(newValue) });
 	}
 	__table[tableName].push_back(newLine);
 	__save();
-	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	return std::vector<std::vector<std::pair<std::string, std::string>>>();
 }
 
-std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__update(std::istringstream& stream)
+std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update(std::istringstream& stream)
 {
 	string assertString;
 	string tableName;
@@ -206,7 +203,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 		throw exception("Wrong command format.");
 	}
 	string updateColumn, updateValue;
-	map<string, wstring> updateDict;
+	map<string, string> updateDict;
 	char assertChar;
 	while (stream >> updateColumn and updateColumn != "WHERE" and updateColumn != "HERE") {
 		stream >> assertChar;
@@ -221,7 +218,7 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 		if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), updateColumn) == __columnOfTable[tableName].end()) {
 			throw exception("No selected column.");
 		}
-		updateDict[updateColumn] = string2wstring(updateValue);
+		updateDict[updateColumn] = string2string(updateValue);
 	}
 	if (updateColumn != "WHERE" and updateColumn != "HERE") {
 		throw exception("Wrong command format.");
@@ -237,17 +234,16 @@ std::vector<std::vector<std::pair<std::string, std::wstring>>> Database::__updat
 		throw exception("No selected column.");
 	}
 	for (auto& i : __table[tableName])
-		for (auto& j : i | views::filter([column, value](pair<string, wstring> k) {return k.first == column and k.second == string2wstring(value); }))
+		for (auto& j : i | views::filter([column, value](pair<string, string> k) {return k.first == column and k.second == string2string(value); }))
 			for (auto& l : i)
 				if (updateDict.contains(l.first))
 					l.second = updateDict[l.first];
 	__save();
-	return std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	return std::vector<std::vector<std::pair<std::string, std::string>>>();
 }
 
 void Database::__saveCommand(std::string command)
 {
-	setlocale(LC_ALL, "chs");
 	string commandsFile;
 	for (auto& i : __tableFiles)
 		if (i.first == "commands")
@@ -262,13 +258,11 @@ void Database::__saveCommand(std::string command)
 
 void Database::__save()
 {
-	setlocale(LC_ALL, "chs");
-	map<string, wstring> tableTitle = { {"commodity",L"商品ID,名称,价格,数量,描述,卖家ID,上架时间,商品状态"},{"order",L"订单ID,商品ID,交易单价,数量,交易时间,卖家ID,买家ID"},{"user",L"用户ID,用户名,密码,联系方式,地址,钱包余额,用户状态"},{"recharge",L"用户ID,充值金额,充值时间"} };
+	map<string, string> tableTitle = { {"commodity","commodityID,commodityName,price,number,description,sellerID,addedDate,state"},{"order","orderID,commodityID,unitPrice,number,date,sellerID,buyerID"},{"user","userID,username,password,phoneNumber,address,balance,userState"},{"recharge","userID,money,rechargeDate"} };
 	for (auto& i : __tableFiles) {
 		if (i.first == "commands")
 			continue;
-		wofstream fout(i.second, ios::out | ios::trunc);
-		fout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+		ofstream fout(i.second, ios::out | ios::trunc);
 		if (!fout)
 			throw exception("Unable to save database.");
 		fout << tableTitle[i.first] << endl;
@@ -277,7 +271,7 @@ void Database::__save()
 				if (k.first == __columnOfTable[i.first].back())
 					fout << k.second << endl;
 				else
-					fout << k.second << L",";
+					fout << k.second << ",";
 			}
 		}
 		fout.close();
