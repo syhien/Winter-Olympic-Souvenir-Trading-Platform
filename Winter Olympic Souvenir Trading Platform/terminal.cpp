@@ -1,6 +1,5 @@
 ﻿#include "terminal.h"
 #include <string>
-#include <format>
 #include <vector>
 #include <iomanip>
 #include <ctime>
@@ -13,17 +12,17 @@ using namespace std;
 
 int getOperationCode()
 {
-	std::string codeString;
+	std::wstring codeString;
 	int codeInt;
-	std::cout << "输入操作：";
-	std::cin >> codeString;
+	std::wcout << L"输入操作：";
+	std::wcin >> codeString;
 	try
 	{
 		codeInt = std::stoi(codeString);
 	}
 	catch (const std::exception&)
 	{
-		std::cout << "不正确的输入\n";
+		std::wcout << L"不正确的输入\n";
 		codeInt = getOperationCode();
 	}
 	return codeInt;
