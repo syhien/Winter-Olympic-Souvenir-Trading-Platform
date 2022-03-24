@@ -809,7 +809,7 @@ string calculateWallet(std::string userID)
 		int count;
 		string price;
 		for (auto& j : i)
-			if (j.first == "count")
+			if (j.first == "number")
 				count = stoi(j.second);
 			else if (j.first == "price")
 				price = "-" + j.second;
@@ -822,7 +822,7 @@ string calculateWallet(std::string userID)
 		int count;
 		string price;
 		for (auto& j : i)
-			if (j.first == "count")
+			if (j.first == "number")
 				count = stoi(j.second);
 			else if (j.first == "price")
 				price = j.second;
@@ -942,7 +942,7 @@ void SignUp()
 
 	newUser.push_back("0.0");
 
-	newUser.push_back("正常");
+	newUser.push_back("active");
 
 	cout << "Check informations:" << endl << endl;
 	cout << "username:" << newUser[1] << endl;
