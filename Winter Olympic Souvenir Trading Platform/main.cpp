@@ -4,12 +4,10 @@
 #include "Administator.h"
 #include "Database.h"
 #include "terminal.h"
-#include <codecvt>
-#include <locale>
 #include "Calculator.h"
-#include <format>
+#include <iomanip>
 #include <ranges>
-#include <Windows.h>
+#include <sstream>
 #include <ctype.h>
 #include <regex>
 #include <queue>
@@ -18,27 +16,25 @@ using namespace std;
 Database database;
 
 int main(int argc, char* args[]) {
-	setlocale(LC_ALL, "chs");
-	wcout.imbue(locale("chs"));
 
 	Administator administator(&database);
 
 	while (WelcomePage(administator));
 
-	cout << "退出程序\n";
+	cout << "Exit\n";
 	return 0;
 }
 
 bool WelcomePage(Administator& administator) {
 	int operationCode;
-	wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.用户登录", L"2.用户注册", L"3.退出程序", L"4.管理员登录");
+	cout << setw(20) << "1.Log in" << setw(20) << "2.Sign up" << setw(20) << "3.Exit" << setw(20) << "4.Log in as Administrator" << endl;
 	while (true)
 	{
 		operationCode = getOperationCode();
 		if (operationCode == 1 or operationCode == 2 or operationCode == 3 or operationCode == 4)
 			break;
 		else
-			cout << "无此操作\n";
+			cout << "Unknown operation\n";
 	}
 	switch (operationCode)
 	{
@@ -49,7 +45,7 @@ bool WelcomePage(Administator& administator) {
 		SignUp();
 		break;
 	case 3:
-		cout << "退出欢迎页\n";
+		cout << "Exit Welcome Page\n";
 		return false;
 	case 4:
 		AdministatorPage(administator);
@@ -63,21 +59,21 @@ bool WelcomePage(Administator& administator) {
 void AdministatorPage(Administator& administator)
 {
 	string name, password;
-	cout << "输入管理员账户名：";
+	cout << "Input administrator name:";
 	cin >> name;
-	cout << "输入管理员密码：";
+	cout << "Input administrator password:";
 	cin >> password;
 	while (administator.login(name, password) == false)
 	{
-		cout << "管理员账号或密码错误\n是否再次尝试？\n输入1重试，输入其他任意数字放弃重试\n";
+		cout << "Administrator's name or password is wrong.\nTry again?\nInput 1 to retry or input others to quit\n";
 		if (getOperationCode() != 1)
 			return;
-		cout << "输入管理员账户名：";
+		cout << "Input administrator name:";
 		cin >> name;
-		cout << "输入管理员密码：";
+		cout << "Input administrator password:";
 		cin >> password;
 	}
-	cout << "登录成功！\n";
+	cout << "Log in successfully!\n";
 	administator.HomePage();
 }
 
@@ -85,22 +81,22 @@ void LogIn()
 {
 	bool checkName = false;
 	bool checkPassword = false;
-	vector<pair<string, wstring> > userInfo;
+	vector<pair<string, string> > userInfo;
 	while (!checkName or !checkPassword)
 	{
-		wstring name, password;
-		cout << "请输入用户名：";
-		wcin >> name;
-		cout << "请输入密码：";
-		wcin >> password;
-		for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(name), "admin", "123456")) {
+		string name, password;
+		cout << "Input username:";
+		cin >> name;
+		cout << "Input password:";
+		cin >> password;
+		for (auto& i : database.perform("SELECT * FROM user WHERE username CONTAINS " + name, "admin", "123456")) {
 			for (auto& j : i) {
 				if (j.first == "name" and j.second == name)
 					checkName = true;
 				if (j.first == "password" and j.second == password)
 					checkPassword = true;
-				if (j.first == "state" and j.second == L"封禁") {
-					cout << "用户已被封禁" << endl;
+				if (j.first == "state" and j.second == "inactive") {
+					cout << "The user has been banned." << endl;
 					return;
 				}
 			}
@@ -108,19 +104,19 @@ void LogIn()
 				userInfo = i;
 		}
 		if (!checkName or !checkPassword) {
-			cout << "账号或密码错误\n是否再次尝试？\n输入1重试，输入其他任意数字放弃重试\n";
+			cout << "Name or password is wrong.\nTry again?\nInput 1 to retry or input others to quit\n";
 			if (getOperationCode() != 1)
 				return;
 		}
 	}
-	cout << "登录成功\n";
+	cout << "Log in successfully\n";
 	bool keepHere = true;
 	string id;
-	for (auto& i : userInfo | views::filter([&](const pair<string, wstring>& j) {return j.first == "userID"; }))
-		id = wstring2string(i.second);
+	for (auto& i : userInfo | views::filter([&](const pair<string, string>& j) {return j.first == "userID"; }))
+		id = i.second;
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.我是买家", L"2.我是卖家", L"3.管理个人信息", L"4.返回上层菜单");
+		cout << setw(20) << "1.I am Buyer" << setw(20) << "2.I am Seller" << setw(20) << "3.Manage profile" << setw(20) << "4.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -141,97 +137,97 @@ void LogIn()
 	}
 }
 
-void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
+void InfoManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
 {
 	bool keepHere = true;
-	wstring newValue;
-	wstring oldValue;
+	string newValue;
+	string oldValue;
 	bool editSuccess = false;
-	wstring userID;
-	for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "userID"; }))
+	string userID;
+	for (auto& i : userInfo | views::filter([newValue](const pair<string, string> j) {return j.first == "userID"; }))
 		userID = i.second;
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.查看信息", L"2.修改信息", L"3.充值", L"4.返回上层菜单");
+		cout << setw(20) << "1.Check profile" << setw(20) << "2.Edit profile" << setw(20) << "3.Recharge" << setw(20) << "4.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
-			wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"用户名", L"联系方式", L"地址", L"钱包余额");
+			cout << setw(20) << "username" << setw(20) << "phone number" << setw(20) << "address" << setw(20) << "balance" << endl;
 			for (auto& i : userInfo) {
-				if (i.first == "name") {
-					wcout << format(L"|{:^37}", i.second);
+				if (i.first == "username") {
+					cout << setw(20) << i.second;
 				}
-				else if (i.first == "contact") {
-					wcout << format(L"|{:^37}", i.second);
+				else if (i.first == "phoneNumber") {
+					cout << setw(20) << i.second;
 				}
 				else if (i.first == "address") {
-					wcout << format(L"|{:^37}", i.second);
+					cout << setw(20) << i.second;
 				}
-				else if (i.first == "wallet") {
+				else if (i.first == "balance") {
 					try
 					{
-						if (stod(calculateWallet(wstring2string(userID))) < 0)
+						if (stod(calculateWallet(userID)) < 0)
 							throw "";
-						database.perform("UPDATE user SET wallet = " + calculateWallet(wstring2string(userID)) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						wcout << format(L"|{:^37}", string2wstring(calculateWallet(wstring2string(userID))));
+						database.perform("UPDATE user SET balance = " + calculateWallet(userID) + " WHERE userID = " + userID, userID, "user");
+						cout << setw(20) << calculateWallet(userID);
 					}
 					catch (const std::exception&)
 					{
-						cout << endl << "余额异常" << endl;
+						cout << endl << "Balance Error" << endl;
 					}
 				}
 			}
-			wcout << "|\n";
+			cout << endl;
 			break;
 		case 2:
-			cout << "请选择想要本次修改的信息" << endl;
-			wcout << format(L"\n|{:^30}|{:^30}|{:^30}|{:^30}|{:^30}|\n", L"1.用户名", L"2.密码", L"3.联系方式", L"4.地址", L"5.放弃本次修改");
+			cout << "Choose the information that should be updated" << endl;
+			cout << setw(20) << "1.username" << setw(20) << "2.password" << setw(20) << "3.phone number" << setw(20) << "4.address" << setw(20) << "5.Quit" << endl;
 			switch (getOperationCode())
 			{
 			case 1:
 				editSuccess = true;
-				cout << "请输入新用户名：";
-				wcin >> newValue;
+				cout << "Input new username:";
+				cin >> newValue;
 				if (newValue.size() > 10) {
-					cout << "用户名过长" << endl;
+					cout << "Too long username" << endl;
 					break;
 				}
-				for (auto& i : database.perform("SELECT * FROM user WHERE name CONTAINS " + wstring2string(newValue), wstring2string(userID), "user"))
+				for (auto& i : database.perform("SELECT * FROM user WHERE username CONTAINS " + newValue, userID, "user"))
 					for (auto& j : i)
-						if (j.first == "name" and j.second == newValue) {
+						if (j.first == "username" and j.second == newValue) {
 							editSuccess = false;
-							cout << "该用户名已被占用" << endl;
+							cout << "Someone already used this username" << endl;
 							break;
 						}
 				if (editSuccess) {
 					try
 					{
-						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "name"; }))
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, string> j) {return j.first == "username"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET name = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "修改用户名成功" << endl;
+						database.perform("UPDATE user SET username = " + newValue + " WHERE userID = " + userID, userID, "user");
+						cout << "Change username successfully" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "操作未生效" << endl;
+						cout << "1gnore 0peration" << endl;
 					}
 				}
 				else {
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 				break;
 			case 2:
 				editSuccess = true;
-				cout << "请输入新密码：";
-				wcin >> newValue;
+				cout << "Input new password:";
+				cin >> newValue;
 				if (newValue.size() > 20) {
-					cout << "密码过长" << endl;
+					cout << "Too long password" << endl;
 					break;
 				}
 				for (auto& i : newValue) {
 					if (!isdigit(i) and !islower(i))
 					{
-						cout << "密码仅允许由小写字母和数字组成" << endl;
+						cout << "Only lowers and digits are allowed" << endl;
 						editSuccess = false;
 						break;
 					}
@@ -239,85 +235,85 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 				if (editSuccess) {
 					try
 					{
-						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "password"; }))
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, string> j) {return j.first == "password"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET password = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "修改密码成功" << endl;
+						database.perform("UPDATE user SET password = " + newValue + " WHERE userID = " + userID, userID, "user");
+						cout << "Change password successfully" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "操作未生效" << endl;
+						cout << "1gnore 0peration" << endl;
 					}
 				}
 				else {
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 				break;
 			case 3:
 				editSuccess = true;
-				cout << "请输入新联系方式：";
-				wcin >> newValue;
+				cout << "Input new phone number:";
+				cin >> newValue;
 				if (newValue.size() > 20) {
-					cout << "联系方式过长" << endl;
+					cout << "Too long phone number" << endl;
 					break;
 				}
-				for (auto& i : newValue | views::filter([](const wchar_t j) {return !isdigit(j); })) {
-					cout << "联系方式仅允许由数字组成" << endl;
+				for (auto& i : newValue | views::filter([](const auto& j) {return !isdigit(j); })) {
+					cout << "Only digits are allowed" << endl;
 					editSuccess = false;
 					break;
 				}
 				if (editSuccess) {
 					try
 					{
-						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "contact"; }))
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, string> j) {return j.first == "phoneNumber"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET contact = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "修改联系方式成功" << endl;
+						database.perform("UPDATE user SET phoneNumber = " + newValue + " WHERE userID = " + userID, userID, "user");
+						cout << "Change phone number successfully" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "操作未生效" << endl;
+						cout << "1gnore 0peration" << endl;
 					}
 				}
 				else {
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 				break;
 			case 4:
 				editSuccess = true;
-				cout << "请输入新地址：";
-				wcin >> newValue;
+				cout << "Input new address:";
+				cin >> newValue;
 				if (newValue.size() > 40) {
-					cout << "地址过长" << endl;
+					cout << "Too long address" << endl;
 					break;
 				}
 				if (editSuccess) {
 					try
 					{
-						for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring> j) {return j.first == "address"; }))
+						for (auto& i : userInfo | views::filter([newValue](const pair<string, string> j) {return j.first == "address"; }))
 							i.second = newValue;
-						database.perform("UPDATE user SET address = " + wstring2string(newValue) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-						cout << "修改地址成功" << endl;
+						database.perform("UPDATE user SET address = " + newValue + " WHERE userID = " + userID, userID, "user");
+						cout << "Change address successfully" << endl;
 					}
 					catch (const std::exception&)
 					{
-						cout << "操作未生效" << endl;
+						cout << "1gnore 0peration" << endl;
 					}
 				}
 				else {
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 				break;
 			case 5:
-				cout << "放弃修改" << endl;
+				cout << "Quit" << endl;
 				break;
 			default:
 				break;
 			}
 			break;
 		case 3:
-			cout << "请输入充值金额：";
-			wcin >> newValue;
+			cout << "Input recharge:";
+			cin >> newValue;
 			try
 			{
 				for (auto &i:newValue)
@@ -330,16 +326,16 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 					if (newValue[newValue.size() - 2] != '.' or newValue[0] == '.')
 						throw exception();
 				}
-				for (auto& i : userInfo | views::filter([newValue](const pair<string, wstring>& j) {return j.first == "wallet"; })) {
+				for (auto& i : userInfo | views::filter([newValue](const pair<string, string>& j) {return j.first == "balance"; })) {
 					oldValue = i.second;
-					i.second = format(L"{:.1f}", stod(oldValue) + stod(newValue));
+					i.second = to_string(stod(oldValue) + stod(newValue));
 				}
-				database.perform("UPDATE user SET wallet = " + wstring2string(format(L"{:.1f}", stod(oldValue) + stod(newValue))) + " WHERE userID = " + wstring2string(userID), wstring2string(userID), "user");
-				database.perform("INSERT INTO recharge VALUES (" + wstring2string(userID) + "," + wstring2string(newValue) + "," + getCurrentTime() + ")", wstring2string(userID), "user");
+				database.perform("UPDATE user SET wallet = " + to_string(stod(oldValue) + stod(newValue)) + " WHERE userID = " + userID, userID, "user");
+				database.perform("INSERT INTO recharge VALUES (" + userID + "," + newValue + "," + getCurrentTime() + ")", userID, "user");
 			}
 			catch (const std::exception&)
 			{
-				cout << "金额仅支持最多含1位小数的非负数值" << endl;
+				cout << "Only abc and abc.d are supported" << endl;
 			}
 			break;
 		case 4:
@@ -354,15 +350,16 @@ void InfoManagePage(std::vector<std::pair<std::string, std::wstring>>& userInfo)
 void SellerPage(std::string id)
 {
 	bool keepHere = true;
-	wstring tmp;
+	string tmp;
 	string command;
-	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
-	auto allOrder = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
+	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::string>>>();
+	auto allOrder = std::vector<std::vector<std::pair<std::string, std::string>>>();
 	vector<string> newCommodity;
-	string itemID;
+	string commodityID;
 	string updateKey, updateValue;
+	stringstream tmpStrStream;
 	while (keepHere) {
-		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.发布商品", L"2.查看发布商品", L"3.修改商品信息", L"4.下架商品", L"5.查看历史订单", L"6.返回上层菜单");
+		cout << setw(20) << "1.New commodity" << setw(20) << "2.Check commodity" << setw(20) << "3.Edit commodity" << setw(20) << "4.Discontinue commodity" << setw(20) << "5.Check order" << setw(20) << "6.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -371,38 +368,45 @@ void SellerPage(std::string id)
 			for (int i = 1; i < 999; i++) {
 				bool existed = false;
 				for (auto& j : allCommodity)
-					for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "itemID"; }))
-						existed = existed or k.second == format(L"M{:0>3}", i);
+					for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "commodityID"; })) {
+						tmpStrStream.clear();
+						tmpStrStream.str("M");
+						tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
+						existed = existed or k.second == tmpStrStream.str();
+					}
 				if (!existed) {
-					newCommodity.push_back(format("M{:0>3}", i));
+					newCommodity.push_back(tmpStrStream.str());
 					break;
 				}
 			}
 
-			cout << "请输入商品名称：";
-			wcin >> tmp;
+			cout << "Input name:";
+			cin >> tmp;
 			if (tmp.length() > 20)
 			{
-				cout << "商品名称过长，请重试" << endl;
+				cout << "Too long name" << endl;
 				break;
 			}
-			newCommodity.push_back(wstring2string(tmp));
+			newCommodity.push_back(tmp);
 
-			cout << "请输入价格（至多精确至小数点后1位）：";
-			wcin >> tmp;
+			cout << "Input price:";
+			cin >> tmp;
 			try
 			{
 				stod(tmp);
 			}
 			catch (const std::exception&)
 			{
-				cout << "不正确的输入，请重试" << endl;
+				cout << "Wrong format" << endl;
 				break;
 			}
-			newCommodity.push_back(format("{:.1f}", stod(tmp)));
+			tmpStrStream.clear();
+			tmpStrStream.str("");
+			tmpStrStream << setprecision(1) << stod(tmp);
+			newCommodity.push_back(tmpStrStream.str());
 
-			cout << "请输入数量：";
-			wcin >> tmp;
+			cout << "Input number:";
+			cin >> tmp;
 			try
 			{
 				stoi(tmp);
@@ -411,31 +415,34 @@ void SellerPage(std::string id)
 			}
 			catch (const std::exception&)
 			{
-				cout << "不正确的输入，请重试" << endl;
+				cout << "Wrong format" << endl;
 				break;
 			}
-			newCommodity.push_back(format("{}", stoi(tmp)));
+			tmpStrStream.clear();
+			tmpStrStream.str("");
+			tmpStrStream << stoi(tmp);
+			newCommodity.push_back(tmpStrStream.str());
 
-			cout << "请输入200字内的商品描述：";
-			wcin >> tmp;
-			tmp = regex_replace(tmp, wregex(L","), L"，");
+			cout << "Input description:";
+			cin >> tmp;
+			tmp = regex_replace(tmp, regex(","), "_");
 			if (tmp.length() > 200) {
-				cout << "不正确的输入，请重试" << endl;
+				cout << "Too long description" << endl;
 				break;
 			}
-			newCommodity.push_back(wstring2string(tmp));
+			newCommodity.push_back(tmp);
 
 			newCommodity.push_back(id);
 			newCommodity.push_back(getCurrentTime());
-			newCommodity.push_back(wstring2string(L"销售中"));
+			newCommodity.push_back("onSale");
 
-			cout << "请确认待添加商品的信息：" << endl << endl;
-			cout << "商品名称：" << newCommodity[1] << endl;
-			cout << "商品价格：" << newCommodity[2] << endl;
-			cout << "商品数量：" << newCommodity[3] << endl;
-			wcout << L"商品描述：" << string2wstring(newCommodity[4]) << endl << endl;
+			cout << "Make sure everything is correct:" << endl << endl;
+			cout << "name:" << newCommodity[1] << endl;
+			cout << "price:" << newCommodity[2] << endl;
+			cout << "number:" << newCommodity[3] << endl;
+			cout << "description" << newCommodity[4] << endl << endl;
 
-			cout << "是否添加商品？输入1以添加，输入其他数字以放弃添加" << endl;
+			cout << "Add commodity? Input 1 to add or input others to quit" << endl;
 			if (getOperationCode() == 1)
 			{
 				try
@@ -445,78 +452,81 @@ void SellerPage(std::string id)
 					command.pop_back();
 					command += ")";
 					database.perform(command, id, "seller");
-					cout << "添加成功" << endl;
+					cout << "Add successfully" << endl;
 				}
 				catch (const std::exception&)
 				{
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 			}
 			else
 			{
-				cout << "放弃添加" << endl;
+				cout << "1gnore 0peration" << endl;
 			}
 
 			break;
 		case 2:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
 			break;
 		case 3:
 			updateKey = "dont";
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
-			cout << "请输入想要修改信息的商品的商品ID：";
-			cin >> itemID;
-			cout << "请选择想要本次修改的信息" << endl;
-			wcout << format(L"\n|{:^38}|{:^38}|{:^38}|{:^38}|\n", L"1.名称", L"2.价格", L"3.数量", L"4.描述");
+			cout << "Input the commodityID of the commodity that should be updated:";
+			cin >> commodityID;
+			cout << "Edit:" << endl;
+			cout << setw(20) << "1.name" << setw(20) << "2.price" << setw(20) << "3.number" << setw(20) << "4.description" << endl;
 			switch (getOperationCode())
 			{
 			case 1:
-				cout << "请输入新名称：";
-				wcin >> tmp;
+				cout << "Input new name:";
+				cin >> tmp;
 				if (tmp.length() > 20)
 				{
-					cout << "商品名称过长，请重试" << endl;
+					cout << "Too long name" << endl;
 					break;
 				}
-				updateKey = "name";
-				updateValue = wstring2string(tmp);
+				updateKey = "commodityName";
+				updateValue = tmp;
 				break;
 			case 2:
-				cout << "请输入新价格：";
-				wcin >> tmp;
+				cout << "Input new price:";
+				cin >> tmp;
 				try
 				{
 					stod(tmp);
 				}
 				catch (const std::exception&)
 				{
-					cout << "不正确的输入，请重试" << endl;
+					cout << "Wrong format" << endl;
 					break;
 				}
+				tmpStrStream.clear();
+				tmpStrStream.str("");
+				tmpStrStream << setprecision(1) << stod(tmp);
 				updateKey = "price";
-				updateValue = format("{:.1f}", stod(tmp));
+				updateValue = tmpStrStream.str();
 				break;
 			case 3:
-				cout << "请输入新数量：";
-				wcin >> tmp;
+				cout << "Input new number:";
+				cin >> tmp;
 				try
 				{
 					stoi(tmp);
@@ -525,22 +535,25 @@ void SellerPage(std::string id)
 				}
 				catch (const std::exception&)
 				{
-					cout << "不正确的输入，请重试" << endl;
+					cout << "Wrong format" << endl;
 					break;
 				}
-				updateKey = "count";
-				updateValue = format("{}", stoi(tmp));
+				tmpStrStream.clear();
+				tmpStrStream.str("");
+				tmpStrStream << stoi(tmp);
+				updateKey = "number";
+				updateValue = tmpStrStream.str();
 				break;
 			case 4:
-				cout << "请输入新描述：";
-				wcin >> tmp;
-				tmp = regex_replace(tmp, wregex(L","), L"，");
+				cout << "Input new description:";
+				cin >> tmp;
+				tmp = regex_replace(tmp, regex(","), "_");
 				if (tmp.length() > 200) {
-					cout << "不正确的输入，请重试" << endl;
+					cout << "Wrong format" << endl;
 					break;
 				}
 				updateKey = "description";
-				updateValue = wstring2string(tmp);
+				updateValue = tmp;
 				break;
 			default:
 				break;
@@ -549,67 +562,67 @@ void SellerPage(std::string id)
 				break;
 			try
 			{
-				command = format("UPDATE commodity SET {} = {} WHERE itemID = {}", updateKey, updateValue, itemID);
+				command = "UPDATE commodity SET " + updateKey + " = " + updateValue + " WHERE commodityID = " + commodityID;
 				database.perform(command, id, "seller");
-				cout << "添加成功" << endl;
+				cout << "Edit successfully" << endl;
 			}
 			catch (const std::exception&)
 			{
-				cout << "操作未生效" << endl;
+				cout << "1gnore 0peration" << endl;
 			}
 			break;
 		case 4:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allCommodity.end());
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
-			cout << "请输入想要下架的商品的商品ID：";
-			cin >> itemID;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != L"销售中"; } return true; }), allCommodity.end());
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != string2wstring(itemID); } return true; }), allCommodity.end());
+			cout << "Input the commodityID of the commodity that should be uncontinued:";
+			cin >> commodityID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "state") return j.second != "onSale"; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [commodityID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "commodityID") return j.second != commodityID; } return true; }), allCommodity.end());
 			if (allCommodity.empty()) {
-				cout << "无可下架商品的商品ID为" << itemID << endl;
+				cout << "No commodity's commodityID equals to " << commodityID << endl;
 				break;
 			}
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
-			cout << "请确认是否下架商品，输入1以下架商品，输入其他数字取消下架\n";
+			cout << "Uncontinue it? Input 1 to uncontinue it or input others to quit\n";
 			if (getOperationCode() == 1) {
 				try
 				{
-					database.perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + itemID, id, "seller");
-					cout << "下架成功" << endl;
+					database.perform("UPDATE commodity SET state = removed WHERE commodityID = " + commodityID, id, "seller");
+					cout << "Uncontinue successfully" << endl;
 				}
 				catch (const std::exception&)
 				{
-					cout << "操作未生效" << endl;
+					cout << "1gnore 0peration" << endl;
 				}
 			}
 			else
-				cout << "放弃下架商品" << endl;
+				cout << "Quit" << endl;
 			break;
 		case 5:
 			allOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + id, id, "seller");
-			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allOrder.end());
+			cout << setw(20) << "orderID" << setw(20) << "commodityID" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "date" << setw(20) << "sellerID" << setw(20) << "buyerID" << endl;
 			for (auto& line : allOrder)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
 			break;
 		case 6:
@@ -624,139 +637,144 @@ void SellerPage(std::string id)
 void BuyerPage(std::string id)
 {
 	bool keepHere = true;
-	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
-	auto allOrder = std::vector<std::vector<std::pair<std::string, std::wstring>>>();
-	wstring itemID;
+	auto allCommodity = std::vector<std::vector<std::pair<std::string, std::string>>>();
+	auto allOrder = std::vector<std::vector<std::pair<std::string, std::string>>>();
+	string commodityID;
 	int count;
 	int availableCount;
 	double price;
 	string newOrderID;
 	string sellerID;
-	wstring keyword;
-	vector<wstring> titles;
+	string keyword;
+	vector<string> titles;
+	stringstream tmpStrStream;
 	while (keepHere)
 	{
-		wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"1.查看商品列表", L"2.购买商品", L"3.搜索商品", L"4.查看历史订单", L"5.查看商品详细信息", L"6.返回上层菜单");
+		cout << setw(20) << "1.View commoditys" << setw(20) << "2.Buy commodity" << setw(20) << "3.Search" << setw(20) << "4.View orders" << setw(20) << "5.View details of commodity" << setw(20) << "6.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "sellerID" << setw(20) << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						wcout << format(L"|{:^25}", i.second);
-				wcout << "|\n";
+						cout << setw(20) << i.second;
+				cout << endl;
 			}
 			break;
 		case 2:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
-			cout << "请输入商品ID：";
-			wcin >> itemID;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) == id; } return true; }), allCommodity.end());
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			cout << "Input commodityID:";
+			cin >> commodityID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second == id; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [commodityID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "commodityID") return j.second != commodityID; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "商品不存在或不可购买" << endl;
+				cout << "Not found or unable to buy" << endl;
 				break;
 			}
-			cout << "请输入购买数量：";
+			cout << "Input number:";
 			cin >> count;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [count](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "count") return stoi(j.second) < count; } return true; }), allCommodity.end());
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [count](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "number") return stoi(j.second) < count; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "商品数量不足，无法购买" << endl;
+				cout << "No enough commodity" << endl;
 				break;
 			}
 			for (auto& i : allCommodity.front())
-				if (i.first == "price")
+				if (i.first == "unitPrice")
 					price = stod(i.second);
-				else if (i.first == "count")
+				else if (i.first == "number")
 					availableCount = stoi(i.second);
 				else if (i.first == "sellerID")
-					sellerID = wstring2string(i.second);
+					sellerID = i.second;
 			if (stod(calculateWallet(id)) < price * count) {
-				cout << "余额不足，无法购买" << endl;
+				cout << "No enough balance" << endl;
 				break;
 			}
 			try
 			{
 				if (count == availableCount)
-					database.perform("UPDATE commodity SET count = 0, state = " + wstring2string(L"已下架") + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
+					database.perform("UPDATE commodity SET count = 0, state = removed WHERE commodityID = " + commodityID, id, "buyer");
 				else
-					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE itemID = " + wstring2string(itemID), id, "buyer");
+					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE commodityID = " + commodityID, id, "buyer");
 				allOrder = database.perform("SELECT * FROM order", id, "buyer");
 				for (int i = 1; i < 999; i++) {
 					bool existed = false;
 					for (auto& j : allOrder)
-						for (auto& k : j | views::filter([i](const pair<string, wstring> l) {return l.first == "orderID"; }))
-							existed = existed or k.second == format(L"T{:0>3}", i);
+						for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "orderID"; })) {
+							tmpStrStream.clear();
+							tmpStrStream.str("T");
+							tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
+							existed = existed or k.second == tmpStrStream.str();
+						}
 					if (!existed) {
-						newOrderID = format("M{:0>3}", i);
+						newOrderID = tmpStrStream.str();
 						break;
 					}
 				}
-				database.perform("INSERT INTO order VALUES " + format("({},{},{:.1f},{},{},{},{})", newOrderID, wstring2string(itemID), price, count, getCurrentTime(), sellerID, id), id, "buyer");
-				database.perform("UPDATE user SET wallet = " + calculateWallet(id) + " WHERE userID = " + id, id, "buyer");
+				database.perform("INSERT INTO order VALUES (" + newOrderID + "," + commodityID + "," + to_string(price) + "," + to_string(count) + "," + getCurrentTime() + "," + sellerID + "," + id + ")", id, "buyer");
+				database.perform("UPDATE user SET balance = " + calculateWallet(id) + " WHERE userID = " + id, id, "buyer");
 			}
 			catch (const std::exception&)
 			{
-				cout << "操作未生效" << endl;
+				cout << "1gnore 0peration" << endl;
 			}
 			break;
 		case 3:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
-			cout << "请输入关键字：";
-			wcin >> keyword;
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
-			for (auto& line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> >& i) {for (auto& j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
-				wcout << endl;
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			cout << "Input keyword:";
+			cin >> keyword;
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "sellerID" << setw(20) << "addedDate" << endl;
+			for (auto& line : allCommodity | views::filter([keyword](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
+				cout << endl;
 				for (auto& i : line)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						wcout << format(L"|{:^25}", i.second);
-				wcout << "|\n";
+						cout << setw(20) << i.second;
+				cout << endl;
 			}
 			break;
 		case 4:
 			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id, id, "buyer");
-			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != id; } return true; }), allOrder.end());
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return j.second != id; } return true; }), allOrder.end());
+			cout << setw(20) << "orderID" << setw(20) << "commodityID" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "date" << setw(20) << "sellerID" << setw(20) << "buyerID" << endl;
 			for (auto& line : allOrder)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(20) << i.second;
+				cout << endl;
 			}
 			break;
 		case 5:
-			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS " + wstring2string(L"销售中"), id, "buyer");
-			wcout << format(L"\n|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|{:^25}|\n", L"商品ID", L"商品名称", L"价格", L"数量", L"卖家ID", L"上架时间");
+			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "sellerID" << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
+				cout << endl;
 				for (auto& i : line)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						wcout << format(L"|{:^25}", i.second);
-				wcout << "|\n";
+						cout << setw(20) << i.second;
+				cout << endl;
 			}
-			cout << "请输入想要查看的商品ID：";
-			wcin >> itemID;
-			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [itemID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "itemID") return j.second != itemID; } return true; }), allCommodity.end());
+			cout << "Input the commodityID that shoule be viewed:";
+			cin >> commodityID;
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [commodityID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "commodityID") return j.second != commodityID; } return true; }), allCommodity.end());
 			if (allCommodity.size() == 0) {
-				cout << "商品不存在或不可购买" << endl;
+				cout << "No such commodity" << endl;
 				break;
 			}
-			titles = { L"商品ID", L"商品名称", L"价格", L"数量", L"描述", L"卖家ID", L"上架时间", L"销售状态" };
+			titles = { "commodityID", "name", "unitPrice", "number", "description", "sellerID", "addedDate", "state" };
 			cout << endl;
 			for (auto& i : allCommodity.front())
-				wcout << titles.front() << L"：" << i.second << endl, titles.erase(titles.begin());
+				cout << titles.front() << ":" << i.second << endl, titles.erase(titles.begin());
 			cout << endl;
 			break;
 		case 6:
@@ -772,13 +790,13 @@ string calculateWallet(std::string userID)
 {
 	Calculator calculator;
 	auto allRecharge = database.perform("SELECT * FROM recharge WHERE userID CONTAINS " + userID, userID, "user");
-	allRecharge.erase(remove_if(allRecharge.begin(), allRecharge.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "userID") return wstring2string(j.second) != userID; } return true; }), allRecharge.end());
+	allRecharge.erase(remove_if(allRecharge.begin(), allRecharge.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "userID") return j.second != userID; } return true; }), allRecharge.end());
 	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID, userID, "user");
-	allBuyOrder.erase(remove_if(allBuyOrder.begin(), allBuyOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "buyerID") return wstring2string(j.second) != userID; } return true; }), allBuyOrder.end());
+	allBuyOrder.erase(remove_if(allBuyOrder.begin(), allBuyOrder.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return j.second != userID; } return true; }), allBuyOrder.end());
 	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID, userID, "user");
-	allSellOrder.erase(remove_if(allSellOrder.begin(), allSellOrder.end(), [userID](const vector<pair<string, wstring> >& i) { for (auto& j : i) { if (j.first == "sellerID") return wstring2string(j.second) != userID; } return true; }), allSellOrder.end());
+	allSellOrder.erase(remove_if(allSellOrder.begin(), allSellOrder.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != userID; } return true; }), allSellOrder.end());
 	string command = "";
-	map<wstring, int> numbers;
+	map<string, int> numbers;
 	for (auto& i : allRecharge)
 		for (auto& j : i)
 			if (j.first == "money") {
@@ -789,12 +807,12 @@ string calculateWallet(std::string userID)
 			}
 	for (auto& i : allBuyOrder) {
 		int count;
-		wstring price;
+		string price;
 		for (auto& j : i)
 			if (j.first == "count")
 				count = stoi(j.second);
 			else if (j.first == "price")
-				price = L"-" + j.second;
+				price = "-" + j.second;
 		if (numbers.contains(price))
 			numbers[price] += count;
 		else
@@ -802,7 +820,7 @@ string calculateWallet(std::string userID)
 	}
 	for (auto& i : allSellOrder) {
 		int count;
-		wstring price;
+		string price;
 		for (auto& j : i)
 			if (j.first == "count")
 				count = stoi(j.second);
@@ -815,20 +833,20 @@ string calculateWallet(std::string userID)
 	}
 	map<int, vector<string>> countNumbers;
 	for (auto& i : numbers)
-		countNumbers[i.second].push_back(wstring2string(i.first));
+		countNumbers[i.second].push_back(i.first);
 	for (auto& i : countNumbers) {
 		if (command.length() == 0)
-			command += format("{}", i.first) + " * ";
+			command += to_string(i.first) + " * ";
 		else
-			command += " + " + format("{}", i.first) + "*";
+			command += " + " + to_string(i.first) + "*";
 		command += "(";
 
 		string subCommand = "";
 		for (auto& j : i.second)
 			if (subCommand.length() == 0)
-				subCommand += format("{}", j);
+				subCommand += j;
 			else
-				subCommand += "+" + format("({})", j);
+				subCommand += "+(" + j + ")";
 		command += subCommand;
 
 		command += ")";
@@ -849,85 +867,91 @@ void SignUp()
 {
 	auto allUser = database.perform("SELECT * FROM user", "admin", "123456");
 	vector<string> newUser;
+	stringstream tmpStrStream;
 	for (int i = 1; i < 999; i++) {
 		bool existed = false;
 		for (auto& j : allUser)
-			for (auto& k : j | views::filter([i](const pair<string, wstring>& l) {return l.first == "userID"; }))
-				existed = existed or k.second == format(L"U{:0>3}", i);
+			for (auto& k : j | views::filter([i](const pair<string, string>& l) {return l.first == "userID"; })) {
+				tmpStrStream.clear();
+				tmpStrStream.str("U");
+				tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
+				existed = existed or k.second == tmpStrStream.str();
+
+			}
 		if (!existed) {
-			newUser.push_back(format("U{:0>3}", i));
+			newUser.push_back(tmpStrStream.str());
 			break;
 		}
 	}
 
-	wstring tmp;
-	cout << "请输入用户名：";
-	wcin >> tmp;
+	string tmp;
+	cout << "Input username:";
+	cin >> tmp;
 	if (tmp.length() > 10) {
-		cout << "用户名过长" << endl;
+		cout << "too long username" << endl;
 		return;
 	}
 	auto nameFound = false;
 	for (auto& i : allUser)
 		for (auto& j : i)
-			if (j.first == "name")
+			if (j.first == "username")
 				nameFound = nameFound or j.second == tmp;
 	if (nameFound) {
-		cout << "该用户名已被注册" << endl;
+		cout << "Someone already used this username" << endl;
 		return;
 	}
-	newUser.push_back(wstring2string(tmp));
+	newUser.push_back(tmp);
 
-	cout << "请输入密码：";
-	wcin >> tmp;
+	cout << "Input password:";
+	cin >> tmp;
 	if (tmp.size() > 20) {
-		cout << "密码过长" << endl;
+		cout << "Too long password" << endl;
 		return;
 	}
 	for (auto& i : tmp) {
 		if (!isdigit(i) and !islower(i))
 		{
-			cout << "密码仅允许由小写字母和数字组成" << endl;
+			cout << "Only lowers and digits are allowed" << endl;
 			return;
 		}
 	}
-	newUser.push_back(wstring2string(tmp));
+	newUser.push_back(tmp);
 	
-	cout << "请输入联系方式：";
-	wcin >> tmp;
+	cout << "Input phone number:";
+	cin >> tmp;
 	if (tmp.size() > 20) {
-		cout << "联系方式过长" << endl;
+		cout << "Too long phone number" << endl;
 		return;
 	}
 	for (auto& i : tmp) {
 		if (!isdigit(i))
 		{
-			cout << "联系方式仅允许由数字组成" << endl;
+			cout << "Only digits are allowed" << endl;
 			return;
 		}
 	}
-	newUser.push_back(wstring2string(tmp));
+	newUser.push_back(tmp);
 
-	cout << "请输入联络地址：";
-	wcin >> tmp;
+	cout << "Input address:";
+	cin >> tmp;
 	if (tmp.size() > 40) {
-		cout << "联络地址过长" << endl;
+		cout << "Too long address" << endl;
 		return;
 	}
-	newUser.push_back(wstring2string(tmp));
+	newUser.push_back(tmp);
 
 	newUser.push_back("0.0");
 
-	newUser.push_back(wstring2string(L"正常"));
+	newUser.push_back("正常");
 
-	cout << "请确认注册信息：" << endl << endl;
-	wcout << L"用户名：" << string2wstring(newUser[1]) << endl;
-	wcout << L"密码：" << string2wstring(newUser[2]) << endl;
-	wcout << L"联系方式：" << string2wstring(newUser[3]) << endl;
-	wcout << L"联络地址：" << string2wstring(newUser[4]) << endl;
+	cout << "Check informations:" << endl << endl;
+	cout << "username:" << newUser[1] << endl;
+	cout << "password:" << newUser[2] << endl;
+	cout << "phone number:" << newUser[3] << endl;
+	cout << "address:" << newUser[4] << endl;
 	cout << endl;
 
-	cout << "输入1以确认注册，输入其他数字取消注册" << endl;
+	cout << "Input 1 to sign up or input others to quit" << endl;
 	if (getOperationCode() == 1) {
 		try
 		{
@@ -937,14 +961,14 @@ void SignUp()
 			command.pop_back();
 			command += ")";
 			database.perform(command, "admin", "123456");
-			cout << "注册成功，返回上层页面" << endl;
+			cout << "Sign up successfully" << endl;
 		}
 		catch (const std::exception&)
 		{
-			cout << "操作未生效" << endl;
+			cout << "1gnore 0peration" << endl;
 		}
 	}
 	else {
-		cout << "放弃注册" << endl;
+		cout << "Quit" << endl;
 	}
 }
