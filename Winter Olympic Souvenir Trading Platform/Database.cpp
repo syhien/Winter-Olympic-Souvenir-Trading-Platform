@@ -19,9 +19,9 @@ using namespace std;
 Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 {
 	__tableFiles = inputFiles;
-	__columnOfTable["commodity"] = { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" };
-	__columnOfTable["order"] = { "orderID","commodityID","unitPrice","number", "date", "sellerID", "buyerID" };
-	__columnOfTable["user"] = { "userID", "username","password","phoneNumber","address","balance","userState" };
+	__columnOfTable["commodity"] = { "commodityID","commodityName","price","number","description","sellerID","addedDate","state" };
+	__columnOfTable["order"] = { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" };
+	__columnOfTable["user"] = { "userID","username","password","phoneNumber","address","balance","userState" };
 	__columnOfTable["recharge"] = { "userID","money","date" };
 	for (auto& i : inputFiles) {
 		if (i.first == "commands")
