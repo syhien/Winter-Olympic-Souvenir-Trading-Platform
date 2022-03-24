@@ -6,7 +6,6 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
-#include <Windows.h>
 #pragma warning(disable:4996)
 using namespace std;
 
@@ -14,7 +13,7 @@ int getOperationCode()
 {
 	std::string codeString;
 	int codeInt;
-	std::cout << "Input operation code：";
+	std::cout << "Input operation code:";
 	std::cin >> codeString;
 	try
 	{
