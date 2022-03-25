@@ -1,8 +1,7 @@
 ﻿#include "Administator.h"
 #include "terminal.h"
-#include <format>
 #include <ranges>
-#include "terminal.h"
+#include <iomanip>
 using namespace std;
 
 Administator::Administator(Database* database)
@@ -19,7 +18,7 @@ void Administator::HomePage()
 {
 	bool login = true;
 	while (login) {
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.商品操作", L"2.订单操作", L"3.用户操作", L"4.登出");
+		cout << setw(30) << "1.Commodity operation" << setw(30) << "2.Order operation" << setw(30) << "3.User operation" << setw(30) << "4.Log out" << endl;
 		auto operationCode = getOperationCode();
 		switch (operationCode)
 		{
@@ -33,11 +32,11 @@ void Administator::HomePage()
 			__handleUserPage();
 			break;
 		case 4:
-			cout << "管理员登出\n";
+			cout << "Administrator log out\n";
 			login = false;
 			break;
 		default:
-			cout << "无此操作\n";
+			cout << "Unknown operation\n";
 			break;
 		}
 	}
@@ -49,69 +48,73 @@ void Administator::__handleCommodityPage()
 	auto allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 	auto selectedCommodity = allCommodity;
 	int tmpInt;
-	wstring keyword;
+	string keyword;
 	while (keepHere) {
-		wcout << format(L"\n|{:^37}|{:^37}|{:^37}|{:^37}|\n", L"1.查看所有商品", L"2.检索商品", L"3.下架商品", L"4.返回上层菜单");
+		cout << setw(30) << "1.Check all commodities" << setw(30) << "2.Search for commodity" << setw(30) << "3.Uncontinue commodity" << setw(30) << "4.Return" << endl;
 		auto operationCode = getOperationCode();
 		allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
+				cout << setw(30) << i;
+			cout << endl;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
 			break;
 		case 2:
-			cout << "请输入关键词：";
-			wcin >> keyword;
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
-			for (auto line : allCommodity | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
-				wcout << endl;
+			cout << "Input keyword:";
+			cin >> keyword;
+			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
+				cout << setw(30) << i;
+			cout << endl;
+			for (auto line : allCommodity | views::filter([keyword](const vector<pair<string, string> > i) {for (auto j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
 			break;
 		case 3:
-			cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
+				cout << setw(30) << i;
 			for (auto& line : allCommodity)
 			{
-				wcout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^19}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
-			cout << "请输入待下架的商品的商品ID：";
-			wcin >> keyword;
+			cout << "Input the commodityID of the commodity that should be uncoutinued:";
+			cin >> keyword;
 			try
 			{
-				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE itemID CONTAINS " + wstring2string(keyword), "admin", "123456");
-				cout << format("\n|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|{:^19}|\n", "商品ID", "名称", "价格", "数量", "描述", "卖家ID", "上架时间", "商品状态");
+				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE commodityID CONTAINS " + keyword, "admin", "123456");
+				for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
+					cout << setw(30) << i;
+				cout << endl;
 				for (auto& line : selectedCommodity)
 				{
-					wcout << endl;
 					for (auto& i : line)
-						wcout << format(L"|{:^19}", i.second);
-					wcout << "|\n";
+						cout << setw(30) << i.second;
+					cout << endl;
 				}
-				cout << "请确认是否下架商品，输入1以下架商品，输入其他数字取消下架\n";
+				cout << "Input 1 to uncontinue it or input others to quit\n";
 				tmpInt = getOperationCode();
 				if (tmpInt != 1) {
-					cout << "已取消下架" << endl;
+					cout << "Quit" << endl;
 					break;
 				}
-				__database->perform("UPDATE commodity SET state = 已下架 WHERE itemID = " + wstring2string(keyword), "admin", "123456");
-				cout << "下架成功\n";
+				__database->perform("UPDATE commodity SET state = removed WHERE commodityID = " + keyword, "admin", "123456");
+				cout << "Uncontinue successfully\n";
 			}
 			catch (const std::exception& e)
 			{
 				cout << e.what() << endl;
-				cout << "操作未生效\n";
+				cout << "1gnore 0peration\n";
 			}
 			break;
 		case 4:
@@ -127,32 +130,35 @@ void Administator::__handleOrderPage()
 {
 	bool keepHere = true;
 	auto allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
-	wstring keyword;
+	string keyword;
 	while (keepHere) {
-		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有订单", L"2.检索订单", L"3.返回上层菜单");
+		cout << setw(30) << "1.Check all orders" << setw(30) << "2.Search for order" << setw(30) << "3.Return" << endl;
 		auto operationCode = getOperationCode();
 		allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
+			for (auto& i : { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" })
+				cout << setw(30) << i;
+			cout << endl;
 			for (auto& line : allOrder)
 			{
-				wcout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
 			break;
 		case 2:
-			cout << "请输入关键词：";
-			wcin >> keyword;
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "订单ID", "商品ID", "交易单价", "数量", "交易时间", "卖家ID", "买家ID");
-			for (auto line : allOrder | views::filter([keyword](const vector<pair<string, wstring> > i) {for (auto j : i) { if (j.second.find(keyword) != wstring::npos) return true; } return false; })) {
-				wcout << endl;
+			cout << "Input keyword:";
+			cin >> keyword;
+			for (auto& i : { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" })
+				cout << setw(30) << i;
+			cout << endl;
+			for (auto line : allOrder | views::filter([keyword](const vector<pair<string, string> > i) {for (auto j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
+				cout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
 			break;
 		case 3:
@@ -169,59 +175,62 @@ void Administator::__handleUserPage()
 	bool keepHere = true;
 	auto allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 	auto selectedUser = allUser;
-	wstring keyword;
+	string keyword;
 	int tmpInt;
 	while (keepHere) {
-		wcout << format(L"\n|{:^50}|{:^50}|{:^50}|\n", L"1.查看所有用户", L"2.封禁用户", L"3.返回上层菜单");
+		cout << setw(30) << "1.Check all users" << setw(30) << "2.Ban user" << setw(30) << "3.Return" << endl;
 		auto operationCode = getOperationCode();
 		allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+			for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
+				cout << setw(30) << i;
+			cout << endl;
 			for (auto& line : allUser)
 			{
-				wcout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
 			break;
 		case 2:
-			cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+			for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
+				cout << setw(30) << i;
+			cout << endl;
 			for (auto& line : allUser)
 			{
-				wcout << endl;
 				for (auto& i : line)
-					wcout << format(L"|{:^21}", i.second);
-				wcout << "|\n";
+					cout << setw(30) << i.second;
+				cout << endl;
 			}
-			cout << "请输入待封禁的用户的用户ID：";
-			wcin >> keyword;
+			cout << "Input the userID of the user who should be banned:";
+			cin >> keyword;
 			try
 			{
-				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + wstring2string(keyword), "admin", "123456");
-				cout << format("\n|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|{:^21}|\n", "用户ID", "用户名", "密码", "联系方式", "地址", "钱包余额", "用户状态");
+				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + keyword, "admin", "123456");
+				for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
+					cout << setw(30) << i;
+				cout << endl;
 				for (auto& line : selectedUser)
 				{
-					wcout << endl;
 					for (auto& i : line)
-						wcout << format(L"|{:^21}", i.second);
-					wcout << "|\n";
+						cout << setw(30) << i.second;
+					cout << endl;
 				}
-				cout << "请确认是否封禁用户，输入1以封禁用户，输入其他数字取消封禁\n";
+				cout << "Input 1 to ban the user or input others to quit\n";
 				tmpInt = getOperationCode();
 				if (tmpInt != 1) {
-					cout << "已取消封禁" << endl;
+					cout << "Quit" << endl;
 					break;
 				}
-				__database->perform("UPDATE user SET state = 封禁 WHERE userID = " + wstring2string(keyword), "admin", "123456");
-				cout << "封禁成功\n";
+				__database->perform("UPDATE user SET userState = inactive WHERE userID = " + keyword, "admin", "123456");
+				cout << "Ban successfully\n";
 			}
 			catch (const std::exception& e)
 			{
 				cout << e.what() << endl;
-				cout << "操作未生效\n";
+				cout << "1gnore 0peration\n";
 			}
 
 			break;

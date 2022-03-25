@@ -4,7 +4,8 @@
 #include <set>
 #include <ctype.h>
 #include <ranges>
-#include <format>
+#include <sstream>
+#include <iostream>
 using namespace std;
 
 
@@ -190,7 +191,11 @@ std::string Calculator::perform(std::string input)
 		auto mid = __divide(input);
 		__check(mid);
 		auto back = __midToBack(mid);
-		auto result = format("{:.1f}", __calculate(back));
+		stringstream ss;
+		ss.precision(1);
+		ss.setf(ios::fixed);
+		ss << __calculate(back);
+		auto result = ss.str();
 		if (result.ends_with('0'))
 			result.pop_back(), result.pop_back();
 		return result;

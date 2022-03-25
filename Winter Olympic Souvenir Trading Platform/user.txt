@@ -1,5 +1,4 @@
-用户ID,用户名,密码,联系方式,地址,钱包余额,用户状态
-U001,南京交通大学,123,13979581094,9栋105,122.2,正常
-U002,东大,123456,12345678,九龙湖,1314.0,封禁
-U003,syhien,1,17776690339,9-105,929,正常
-U004,ZJU,999,3295790,DFJWEIO衄哦20j,0.0,正常
+userID,username,password,phoneNumber,address,balance,userState
+U001,user1,123456,12345678,Nanjing,1024.0,active
+U002,user2,123456,12345678,Hangzhou,1314.0,inactive
+U003,Nju,1,17776690339,g3498,939,inactive
