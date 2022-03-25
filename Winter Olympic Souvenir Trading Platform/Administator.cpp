@@ -18,7 +18,7 @@ void Administator::HomePage()
 {
 	bool login = true;
 	while (login) {
-		cout << setw(20) << "1.Commodity operation" << setw(20) << "2.Order operation" << setw(20) << "3.User operation" << setw(20) << "4.Log out" << endl;
+		cout << setw(30) << "1.Commodity operation" << setw(30) << "2.Order operation" << setw(30) << "3.User operation" << setw(30) << "4.Log out" << endl;
 		auto operationCode = getOperationCode();
 		switch (operationCode)
 		{
@@ -50,20 +50,19 @@ void Administator::__handleCommodityPage()
 	int tmpInt;
 	string keyword;
 	while (keepHere) {
-		cout << setw(20) << "1.Check all commodities" << setw(20) << "2.Search for commodity" << setw(20) << "3.Uncontinue commodity" << setw(20) << "4.Return" << endl;
+		cout << setw(30) << "1.Check all commodities" << setw(30) << "2.Search for commodity" << setw(30) << "3.Uncontinue commodity" << setw(30) << "4.Return" << endl;
 		auto operationCode = getOperationCode();
 		allCommodity = __database->perform("SELECT * FROM commodity", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
 			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto& line : allCommodity)
 			{
-				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -71,23 +70,22 @@ void Administator::__handleCommodityPage()
 			cout << "Input keyword:";
 			cin >> keyword;
 			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto line : allCommodity | views::filter([keyword](const vector<pair<string, string> > i) {for (auto j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
 		case 3:
 			for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			for (auto& line : allCommodity)
 			{
-				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Input the commodityID of the commodity that should be uncoutinued:";
@@ -96,13 +94,12 @@ void Administator::__handleCommodityPage()
 			{
 				selectedCommodity = __database->perform("SELECT * FROM commodity WHERE commodityID CONTAINS " + keyword, "admin", "123456");
 				for (auto& i : { "commodityID", "commodityName","price","number","description", "sellerID", "addedDate", "state" })
-					cout << setw(20) << i;
+					cout << setw(30) << i;
 				cout << endl;
 				for (auto& line : selectedCommodity)
 				{
-					cout << endl;
 					for (auto& i : line)
-						cout << setw(20) << i.second;
+						cout << setw(30) << i.second;
 					cout << endl;
 				}
 				cout << "Input 1 to uncontinue it or input others to quit\n";
@@ -135,20 +132,19 @@ void Administator::__handleOrderPage()
 	auto allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 	string keyword;
 	while (keepHere) {
-		cout << setw(20) << "1.Check all orders" << setw(20) << "2.Search for order" << setw(20) << "3.Return" << endl;
+		cout << setw(30) << "1.Check all orders" << setw(30) << "2.Search for order" << setw(30) << "3.Return" << endl;
 		auto operationCode = getOperationCode();
 		allOrder = __database->perform("SELECT * FROM order", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
 			for (auto& i : { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto& line : allOrder)
 			{
-				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -156,12 +152,12 @@ void Administator::__handleOrderPage()
 			cout << "Input keyword:";
 			cin >> keyword;
 			for (auto& i : { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto line : allOrder | views::filter([keyword](const vector<pair<string, string> > i) {for (auto j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -182,32 +178,30 @@ void Administator::__handleUserPage()
 	string keyword;
 	int tmpInt;
 	while (keepHere) {
-		cout << setw(20) << "1.Check all users" << setw(20) << "2.Ban user" << setw(20) << "3.Return" << endl;
+		cout << setw(30) << "1.Check all users" << setw(30) << "2.Ban user" << setw(30) << "3.Return" << endl;
 		auto operationCode = getOperationCode();
 		allUser = __database->perform("SELECT * FROM user", "admin", "123456");
 		switch (operationCode)
 		{
 		case 1:
 			for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto& line : allUser)
 			{
-				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
 		case 2:
 			for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
-				cout << setw(20) << i;
+				cout << setw(30) << i;
 			cout << endl;
 			for (auto& line : allUser)
 			{
-				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Input the userID of the user who should be banned:";
@@ -216,13 +210,12 @@ void Administator::__handleUserPage()
 			{
 				selectedUser = __database->perform("SELECT * FROM user WHERE userID CONTAINS " + keyword, "admin", "123456");
 				for (auto& i : { "userID","username","password","phoneNumber","address","balance","userState" })
-					cout << setw(20) << i;
+					cout << setw(30) << i;
 				cout << endl;
 				for (auto& line : selectedUser)
 				{
-					cout << endl;
 					for (auto& i : line)
-						cout << setw(20) << i.second;
+						cout << setw(30) << i.second;
 					cout << endl;
 				}
 				cout << "Input 1 to ban the user or input others to quit\n";
@@ -231,7 +224,7 @@ void Administator::__handleUserPage()
 					cout << "Quit" << endl;
 					break;
 				}
-				__database->perform("UPDATE user SET state = inactive WHERE userID = " + keyword, "admin", "123456");
+				__database->perform("UPDATE user SET userState = inactive WHERE userID = " + keyword, "admin", "123456");
 				cout << "Ban successfully\n";
 			}
 			catch (const std::exception& e)

@@ -1,4 +1,4 @@
-userID,money,date
+userID,money,rechargeDate
 U001,112.2,2022-03-01
 U001,10,2022-03-14
 U003,1000,2022-03-15

@@ -27,7 +27,7 @@ int main(int argc, char* args[]) {
 
 bool WelcomePage(Administator& administator) {
 	int operationCode;
-	cout << setw(20) << "1.Log in" << setw(20) << "2.Sign up" << setw(20) << "3.Exit" << setw(20) << "4.Log in as Administrator" << endl;
+	cout << setw(30) << "1.Log in" << setw(30) << "2.Sign up" << setw(30) << "3.Exit" << setw(30) << "4.Log in as Administrator" << endl;
 	while (true)
 	{
 		operationCode = getOperationCode();
@@ -91,11 +91,11 @@ void LogIn()
 		cin >> password;
 		for (auto& i : database.perform("SELECT * FROM user WHERE username CONTAINS " + name, "admin", "123456")) {
 			for (auto& j : i) {
-				if (j.first == "name" and j.second == name)
+				if (j.first == "username" and j.second == name)
 					checkName = true;
 				if (j.first == "password" and j.second == password)
 					checkPassword = true;
-				if (j.first == "state" and j.second == "inactive") {
+				if (j.first == "userState" and j.second == "inactive") {
 					cout << "The user has been banned." << endl;
 					return;
 				}
@@ -116,7 +116,7 @@ void LogIn()
 		id = i.second;
 	while (keepHere)
 	{
-		cout << setw(20) << "1.I am Buyer" << setw(20) << "2.I am Seller" << setw(20) << "3.Manage profile" << setw(20) << "4.Return" << endl;
+		cout << setw(30) << "1.I am Buyer" << setw(30) << "2.I am Seller" << setw(30) << "3.Manage profile" << setw(30) << "4.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -148,20 +148,20 @@ void InfoManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
 		userID = i.second;
 	while (keepHere)
 	{
-		cout << setw(20) << "1.Check profile" << setw(20) << "2.Edit profile" << setw(20) << "3.Recharge" << setw(20) << "4.Return" << endl;
+		cout << setw(30) << "1.Check profile" << setw(30) << "2.Edit profile" << setw(30) << "3.Recharge" << setw(30) << "4.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
-			cout << setw(20) << "username" << setw(20) << "phone number" << setw(20) << "address" << setw(20) << "balance" << endl;
+			cout << setw(30) << "username" << setw(30) << "phone number" << setw(30) << "address" << setw(30) << "balance" << endl;
 			for (auto& i : userInfo) {
 				if (i.first == "username") {
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				}
 				else if (i.first == "phoneNumber") {
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				}
 				else if (i.first == "address") {
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				}
 				else if (i.first == "balance") {
 					try
@@ -169,7 +169,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
 						if (stod(calculateWallet(userID)) < 0)
 							throw "";
 						database.perform("UPDATE user SET balance = " + calculateWallet(userID) + " WHERE userID = " + userID, userID, "user");
-						cout << setw(20) << calculateWallet(userID);
+						cout << setw(30) << calculateWallet(userID);
 					}
 					catch (const std::exception&)
 					{
@@ -181,7 +181,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
 			break;
 		case 2:
 			cout << "Choose the information that should be updated" << endl;
-			cout << setw(20) << "1.username" << setw(20) << "2.password" << setw(20) << "3.phone number" << setw(20) << "4.address" << setw(20) << "5.Quit" << endl;
+			cout << setw(30) << "1.username" << setw(30) << "2.password" << setw(30) << "3.phone number" << setw(30) << "4.address" << setw(30) << "5.Quit" << endl;
 			switch (getOperationCode())
 			{
 			case 1:
@@ -330,7 +330,7 @@ void InfoManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
 					oldValue = i.second;
 					i.second = to_string(stod(oldValue) + stod(newValue));
 				}
-				database.perform("UPDATE user SET wallet = " + to_string(stod(oldValue) + stod(newValue)) + " WHERE userID = " + userID, userID, "user");
+				database.perform("UPDATE user SET balance = " + to_string(stod(oldValue) + stod(newValue)) + " WHERE userID = " + userID, userID, "user");
 				database.perform("INSERT INTO recharge VALUES (" + userID + "," + newValue + "," + getCurrentTime() + ")", userID, "user");
 			}
 			catch (const std::exception&)
@@ -359,7 +359,7 @@ void SellerPage(std::string id)
 	string updateKey, updateValue;
 	stringstream tmpStrStream;
 	while (keepHere) {
-		cout << setw(20) << "1.New commodity" << setw(20) << "2.Check commodity" << setw(20) << "3.Edit commodity" << setw(20) << "4.Discontinue commodity" << setw(20) << "5.Check order" << setw(20) << "6.Return" << endl;
+		cout << setw(30) << "1.New commodity" << setw(30) << "2.Check commodity" << setw(30) << "3.Edit commodity" << setw(30) << "4.Discontinue commodity" << setw(30) << "5.Check order" << setw(30) << "6.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -370,7 +370,8 @@ void SellerPage(std::string id)
 				for (auto& j : allCommodity)
 					for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "commodityID"; })) {
 						tmpStrStream.clear();
-						tmpStrStream.str("M");
+						tmpStrStream.str("");
+						tmpStrStream << "M";
 						tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 						existed = existed or k.second == tmpStrStream.str();
 					}
@@ -402,6 +403,7 @@ void SellerPage(std::string id)
 			}
 			tmpStrStream.clear();
 			tmpStrStream.str("");
+			tmpStrStream.setf(ios::fixed);
 			tmpStrStream << setprecision(1) << stod(tmp);
 			newCommodity.push_back(tmpStrStream.str());
 
@@ -468,12 +470,12 @@ void SellerPage(std::string id)
 		case 2:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "description" << setw(30) << "sellerID" << setw(30) << "addedDate" << setw(30) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -481,18 +483,18 @@ void SellerPage(std::string id)
 			updateKey = "dont";
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "description" << setw(30) << "sellerID" << setw(30) << "addedDate" << setw(30) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Input the commodityID of the commodity that should be updated:";
 			cin >> commodityID;
 			cout << "Edit:" << endl;
-			cout << setw(20) << "1.name" << setw(20) << "2.price" << setw(20) << "3.number" << setw(20) << "4.description" << endl;
+			cout << setw(30) << "1.name" << setw(30) << "2.price" << setw(30) << "3.number" << setw(30) << "4.description" << endl;
 			switch (getOperationCode())
 			{
 			case 1:
@@ -520,6 +522,7 @@ void SellerPage(std::string id)
 				}
 				tmpStrStream.clear();
 				tmpStrStream.str("");
+				tmpStrStream.setf(ios::fixed);
 				tmpStrStream << setprecision(1) << stod(tmp);
 				updateKey = "price";
 				updateValue = tmpStrStream.str();
@@ -574,12 +577,12 @@ void SellerPage(std::string id)
 		case 4:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE sellerID CONTAINS " + id, id, "seller");
 			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allCommodity.end());
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "description" << setw(30) << "sellerID" << setw(30) << "addedDate" << setw(30) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Input the commodityID of the commodity that should be uncontinued:";
@@ -590,12 +593,12 @@ void SellerPage(std::string id)
 				cout << "No commodity's commodityID equals to " << commodityID << endl;
 				break;
 			}
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "description" << setw(20) << "sellerID" << setw(20) << "addedDate" << setw(20) << "state" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "description" << setw(30) << "sellerID" << setw(30) << "addedDate" << setw(30) << "state" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Uncontinue it? Input 1 to uncontinue it or input others to quit\n";
@@ -616,12 +619,12 @@ void SellerPage(std::string id)
 		case 5:
 			allOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + id, id, "seller");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != id; } return true; }), allOrder.end());
-			cout << setw(20) << "orderID" << setw(20) << "commodityID" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "date" << setw(20) << "sellerID" << setw(20) << "buyerID" << endl;
+			cout << setw(30) << "orderID" << setw(30) << "commodityID" << setw(30) << "unitPrice" << setw(30) << "number" << setw(30) << "date" << setw(30) << "sellerID" << setw(30) << "buyerID" << endl;
 			for (auto& line : allOrder)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -650,12 +653,12 @@ void BuyerPage(std::string id)
 	stringstream tmpStrStream;
 	while (keepHere)
 	{
-		cout << setw(20) << "1.View commoditys" << setw(20) << "2.Buy commodity" << setw(20) << "3.Search" << setw(20) << "4.View orders" << setw(20) << "5.View details of commodity" << setw(20) << "6.Return" << endl;
+		cout << setw(30) << "1.View commoditys" << setw(30) << "2.Buy commodity" << setw(30) << "3.Search" << setw(30) << "4.View orders" << setw(30) << "5.View details of commodity" << setw(30) << "6.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "sellerID" << setw(20) << "addedDate" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "sellerID" << setw(30) << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
@@ -663,7 +666,7 @@ void BuyerPage(std::string id)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						cout << setw(20) << i.second;
+						cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
@@ -707,7 +710,8 @@ void BuyerPage(std::string id)
 					for (auto& j : allOrder)
 						for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "orderID"; })) {
 							tmpStrStream.clear();
-							tmpStrStream.str("T");
+							tmpStrStream.str("");
+							tmpStrStream << "T";
 							tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 							existed = existed or k.second == tmpStrStream.str();
 						}
@@ -728,32 +732,32 @@ void BuyerPage(std::string id)
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
 			cout << "Input keyword:";
 			cin >> keyword;
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "price" << setw(20) << "number" << setw(20) << "sellerID" << setw(20) << "addedDate" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "sellerID" << setw(30) << "addedDate" << endl;
 			for (auto& line : allCommodity | views::filter([keyword](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.second.find(keyword) != string::npos) return true; } return false; })) {
 				cout << endl;
 				for (auto& i : line)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						cout << setw(20) << i.second;
+						cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
 		case 4:
 			allOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + id, id, "buyer");
 			allOrder.erase(remove_if(allOrder.begin(), allOrder.end(), [id](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return j.second != id; } return true; }), allOrder.end());
-			cout << setw(20) << "orderID" << setw(20) << "commodityID" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "date" << setw(20) << "sellerID" << setw(20) << "buyerID" << endl;
+			cout << setw(30) << "orderID" << setw(30) << "commodityID" << setw(30) << "unitPrice" << setw(30) << "number" << setw(30) << "date" << setw(30) << "sellerID" << setw(30) << "buyerID" << endl;
 			for (auto& line : allOrder)
 			{
 				cout << endl;
 				for (auto& i : line)
-					cout << setw(20) << i.second;
+					cout << setw(30) << i.second;
 				cout << endl;
 			}
 			break;
 		case 5:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
-			cout << setw(20) << "commodityID" << setw(20) << "name" << setw(20) << "unitPrice" << setw(20) << "number" << setw(20) << "sellerID" << "addedDate" << endl;
+			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "unitPrice" << setw(30) << "number" << setw(30) << "sellerID" << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
 				cout << endl;
@@ -761,7 +765,7 @@ void BuyerPage(std::string id)
 					if (i.first == "description" or i.first == "state")
 						continue;
 					else
-						cout << setw(20) << i.second;
+						cout << setw(30) << i.second;
 				cout << endl;
 			}
 			cout << "Input the commodityID that shoule be viewed:";
@@ -791,9 +795,9 @@ string calculateWallet(std::string userID)
 	Calculator calculator;
 	auto allRecharge = database.perform("SELECT * FROM recharge WHERE userID CONTAINS " + userID, userID, "user");
 	allRecharge.erase(remove_if(allRecharge.begin(), allRecharge.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "userID") return j.second != userID; } return true; }), allRecharge.end());
-	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID, userID, "user");
+	auto allBuyOrder = database.perform("SELECT * FROM order WHERE buyerID CONTAINS " + userID, userID, "buyer");
 	allBuyOrder.erase(remove_if(allBuyOrder.begin(), allBuyOrder.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return j.second != userID; } return true; }), allBuyOrder.end());
-	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID, userID, "user");
+	auto allSellOrder = database.perform("SELECT * FROM order WHERE sellerID CONTAINS " + userID, userID, "seller");
 	allSellOrder.erase(remove_if(allSellOrder.begin(), allSellOrder.end(), [userID](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != userID; } return true; }), allSellOrder.end());
 	string command = "";
 	map<string, int> numbers;
@@ -811,7 +815,7 @@ string calculateWallet(std::string userID)
 		for (auto& j : i)
 			if (j.first == "number")
 				count = stoi(j.second);
-			else if (j.first == "price")
+			else if (j.first == "unitPrice")
 				price = "-" + j.second;
 		if (numbers.contains(price))
 			numbers[price] += count;
@@ -824,7 +828,7 @@ string calculateWallet(std::string userID)
 		for (auto& j : i)
 			if (j.first == "number")
 				count = stoi(j.second);
-			else if (j.first == "price")
+			else if (j.first == "unitPrice")
 				price = j.second;
 		if (numbers.contains(price))
 			numbers[price] += count;
@@ -873,7 +877,8 @@ void SignUp()
 		for (auto& j : allUser)
 			for (auto& k : j | views::filter([i](const pair<string, string>& l) {return l.first == "userID"; })) {
 				tmpStrStream.clear();
-				tmpStrStream.str("U");
+				tmpStrStream.str("");
+				tmpStrStream << "U";
 				tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 				existed = existed or k.second == tmpStrStream.str();
 

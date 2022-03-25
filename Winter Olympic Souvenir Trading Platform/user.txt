@@ -1,3 +1,4 @@
 userID,username,password,phoneNumber,address,balance,userState
 U001,user1,123456,12345678,Nanjing,1024.0,active
 U002,user2,123456,12345678,Hangzhou,1314.0,inactive
+U003,Nju,1,17776690339,g3498,939,inactive

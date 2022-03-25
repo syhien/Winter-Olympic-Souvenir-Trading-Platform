@@ -1,3 +1,3 @@
 commodityID,commodityName,price,number,description,sellerID,addedDate,state
-M001,badge,100.0,10,souvenir,U001,2022-02-15,onSale
+M001,badge,100.0,10,souvenir,U001,2022-02-15,removed
 M002,GarageKits,10.0,10,souvenir,U001,2022-02-15,removed

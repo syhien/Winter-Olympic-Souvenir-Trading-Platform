@@ -61,15 +61,15 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::perform(
 	if (sender == "admin" and mode == "123456")
 		return result;
 	if (mode == "seller") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return string2string(j.second) != sender; } return true; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "sellerID") return j.second != sender; } return true; }), result.end());
 		return result;
 	}
 	if (mode == "buyer") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return string2string(j.second) != sender; } return false; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "buyerID") return j.second != sender; } return false; }), result.end());
 		return result;
 	}
 	if (mode == "user") {
-		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "userID") return string2string(j.second) != sender; } return true; }), result.end());
+		result.erase(remove_if(result.begin(), result.end(), [sender](const vector<pair<string, string> >& i) { for (auto& j : i) { if (j.first == "userID") return j.second != sender; } return true; }), result.end());
 		return result;
 	}
 	return std::vector<std::vector<std::pair<std::string, std::string>>>();
@@ -136,7 +136,7 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 		std::vector<std::vector<std::pair<std::string, std::string> > > result;
 		for (auto i : __table[tableName]) {
 			for (auto j : i | views::filter([column](pair<string, string> k) {return k.first == column; })) {
-				if (j.second.find(string2string(value)) != string::npos)
+				if (j.second.find(value) != string::npos)
 					result.push_back(i);
 			}
 		}
@@ -183,7 +183,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__insert
 		if (newValue.empty()) {
 			throw exception("Wrong command format.");
 		}
-		newLine.push_back({ i,string2string(newValue) });
+		newLine.push_back({ i,newValue });
 	}
 	__table[tableName].push_back(newLine);
 	__save();
@@ -218,7 +218,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update
 		if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), updateColumn) == __columnOfTable[tableName].end()) {
 			throw exception("No selected column.");
 		}
-		updateDict[updateColumn] = string2string(updateValue);
+		updateDict[updateColumn] = updateValue;
 	}
 	if (updateColumn != "WHERE" and updateColumn != "HERE") {
 		throw exception("Wrong command format.");
@@ -234,7 +234,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update
 		throw exception("No selected column.");
 	}
 	for (auto& i : __table[tableName])
-		for (auto& j : i | views::filter([column, value](pair<string, string> k) {return k.first == column and k.second == string2string(value); }))
+		for (auto& j : i | views::filter([column, value](pair<string, string> k) {return k.first == column and k.second == value; }))
 			for (auto& l : i)
 				if (updateDict.contains(l.first))
 					l.second = updateDict[l.first];
