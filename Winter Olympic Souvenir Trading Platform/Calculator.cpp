@@ -4,6 +4,7 @@
 #include <set>
 #include <ctype.h>
 #include <ranges>
+#include <cmath>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
