@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <ctime>
 #include <ranges>
+#include <stdexcept>
 #include <exception>
 #include "terminal.h"
 #pragma warning(disable:4996)
@@ -31,8 +32,9 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		try
 		{
 			ifstream fin(tablePath, ios::in);
-			if (!fin)
-				throw exception("No selected file.");
+			if (!fin) {
+				throw exception(logic_error("No selected file."));
+			}
 			string line;
 			getline(fin, line);
 			while (getline(fin, line)) {
@@ -91,7 +93,7 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__perf
 		return __update(commandStream);
 	}
 	else {
-		throw exception("No selected command.");
+		throw exception(logic_error("No selected command."));
 	}
 	return std::vector<std::vector<std::pair<std::string, std::string> > >();
 }
@@ -106,16 +108,16 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 	string assertString;
 	stream >> assertString;
 	if (assertString != "*") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	stream >> assertString;
 	if (assertString != "FROM") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw exception("No selected table.");
+		throw exception(logic_error("No selected table."));
 	}
 	if (!(stream >> assertString) or assertString.empty()) {
 		// select ALL
@@ -126,12 +128,12 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 		stream >> column;
 		stream >> assertString;
 		if (assertString != "CONTAINS") {
-			throw exception("Wrong command format.");
+			throw exception(logic_error("Wrong command format."));
 		}
 		string value;
 		stream >> value;
 		if ((stream >> assertString) and !assertString.empty()) {
-			throw exception("Wrong command format.");
+			throw exception(logic_error("Wrong command format."));
 		}
 		std::vector<std::vector<std::pair<std::string, std::string> > > result;
 		for (auto i : __table[tableName]) {
@@ -143,7 +145,7 @@ std::vector<std::vector<std::pair<std::string, std::string> > > Database::__sele
 		return result;
 	}
 	else {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	return std::vector<std::vector<std::pair<std::string, std::string> > >();
 }
@@ -153,26 +155,26 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__insert
 	string assertString;
 	stream >> assertString;
 	if (assertString != "INTO") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw exception("No selected table.");
+		throw exception(logic_error("No selected table."));
 	}
 	stream >> assertString;
 	if (assertString != "VALUES") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	char assertChar;
 	stream >> assertChar;
 	if (assertChar != '(') {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	string line;
 	stream >> line;
 	if (line.back() != ')') {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	line.pop_back();
 	istringstream lineStream(line);
@@ -181,7 +183,7 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__insert
 		string newValue;
 		getline(lineStream, newValue, ',');
 		if (newValue.empty()) {
-			throw exception("Wrong command format.");
+			throw exception(logic_error("Wrong command format."));
 		}
 		newLine.push_back({ i,newValue });
 	}
@@ -196,11 +198,11 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update
 	string tableName;
 	stream >> tableName;
 	if (!__table.contains(tableName)) {
-		throw exception("No selected table.");
+		throw exception(logic_error("No selected table."));
 	}
 	stream >> assertString;
 	if (assertString != "SET") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	string updateColumn, updateValue;
 	map<string, string> updateDict;
@@ -208,30 +210,30 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update
 	while (stream >> updateColumn and updateColumn != "WHERE" and updateColumn != "HERE") {
 		stream >> assertChar;
 		if (assertChar != '=') {
-			throw exception("Wrong command format.");
+			throw exception(logic_error("Wrong command format."));
 		}
 		stream >> updateValue;
 		stream >> assertChar;
 		if (assertChar != ',' and assertChar != 'W') {
-			throw exception("Wrong command format.");
+			throw exception(logic_error("Wrong command format."));
 		}
 		if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), updateColumn) == __columnOfTable[tableName].end()) {
-			throw exception("No selected column.");
+			throw exception(logic_error("No selected column."));
 		}
 		updateDict[updateColumn] = updateValue;
 	}
 	if (updateColumn != "WHERE" and updateColumn != "HERE") {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	string column, value;
 	stream >> column;
 	stream >> assertChar;
 	stream >> value;
 	if (assertChar != '=') {
-		throw exception("Wrong command format.");
+		throw exception(logic_error("Wrong command format."));
 	}
 	if (find(__columnOfTable[tableName].begin(), __columnOfTable[tableName].end(), column) == __columnOfTable[tableName].end()) {
-		throw exception("No selected column.");
+		throw exception(logic_error("No selected column."));
 	}
 	for (auto& i : __table[tableName])
 		for (auto& j : i | views::filter([column, value](pair<string, string> k) {return k.first == column and k.second == value; }))
@@ -264,7 +266,7 @@ void Database::__save()
 			continue;
 		ofstream fout(i.second, ios::out | ios::trunc);
 		if (!fout)
-			throw exception("Unable to save database.");
+			throw exception(logic_error("Unable to save database."));
 		fout << tableTitle[i.first] << endl;
 		for (auto& j : __table[i.first]) {
 			for (auto& k : j) {
