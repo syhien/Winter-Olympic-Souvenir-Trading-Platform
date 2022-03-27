@@ -11,7 +11,7 @@
 #include <iomanip>
 #include <ctime>
 #include <ranges>
-#include <Windows.h>
+#include <exception>
 #include "terminal.h"
 #pragma warning(disable:4996)
 using namespace std;
