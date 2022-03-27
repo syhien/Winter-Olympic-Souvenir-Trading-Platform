@@ -1,6 +1,5 @@
 #include "terminal.h"
 #include <string>
-#include <format>
 #include <vector>
 #include <iomanip>
 #include <ctime>
