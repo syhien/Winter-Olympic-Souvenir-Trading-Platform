@@ -6,6 +6,7 @@
 #include <ranges>
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 #include <exception>
 using namespace std;
 
@@ -16,7 +17,7 @@ std::vector<item> Calculator::__divide(std::string input)
 	const set<char> legalChar = { '+','-','*','/','(',')' };
 	for (int i = 0; i < input.size(); i++) {
 		if (input[i] == '.') {
-			throw exception("Wrong number format.");
+			throw exception(logic_error("Wrong number format."));
 		}
 		if (legalChar.contains(input[i])) {
 			mid.push_back({ false,0,input[i] });
@@ -32,13 +33,13 @@ std::vector<item> Calculator::__divide(std::string input)
 			}
 			string operand = input.substr(i, len);
 			if (operand.front() == '.' or operand.back() == '.') {
-				throw exception("Wrong number format.");
+				throw exception(logic_error("Wrong number format."));
 			}
 			int dotCount = 0;
 			for (auto& i : operand | views::filter([](char j) {return j == '.'; }))
 				dotCount++;
 			if (dotCount > 1) {
-				throw exception("Wrong number format.");
+				throw exception(logic_error("Wrong number format."));
 			}
 			try
 			{
@@ -47,14 +48,14 @@ std::vector<item> Calculator::__divide(std::string input)
 			}
 			catch (const std::exception&)
 			{
-				throw exception("Wrong number format.");
+				throw exception(logic_error("Wrong number format."));
 			}
 		}
 		else if (input[i] == ' ') {
 			continue;
 		}
 		else {
-			throw exception("Unknown char.");
+			throw exception(logic_error("Unknown char."));
 		}
 	}
 	return mid;
@@ -66,28 +67,28 @@ void Calculator::__check(std::vector<item>& mid)
 	for (int i = 0; i < mid.size(); i++) {
 		if (mid[i].isOperand) {
 			if (i - 1 >= 0 and mid[i - 1].isOperand)
-				throw exception("Continuous operands.");
+				throw exception(logic_error("Continuous operands."));
 			if (i + 1 < mid.size() and mid[i + 1].isOperand)
-				throw exception("Continuous operands.");
+				throw exception(logic_error("Continuous operands."));
 		}
 		else {
 			if (mid[i]._operator == '(') {
 				if (i - 1 >= 0 and mid[i - 1].isOperand)
-					throw exception("Missing operator.");
+					throw exception(logic_error("Missing operator."));
 				if (i + 1 < mid.size() and !mid[i + 1].isOperand and mid[i + 1]._operator != '-' and mid[i + 1]._operator != '(')
-					throw exception("Missing operand.");
+					throw exception(logic_error("Missing operand."));
 			}
 			else if (mid[i]._operator == ')') {
 				if (i - 1 >= 0 and !mid[i - 1].isOperand and mid[i - 1]._operator != ')')
-					throw exception("Missing operand.");
+					throw exception(logic_error("Missing operand."));
 				if (i + 1 < mid.size() and mid[i + 1].isOperand)
-					throw exception("Missing operator.");
+					throw exception(logic_error("Missing operator."));
 			}
 			else {
 				if (i - 1 >= 0 and !mid[i - 1].isOperand and mid[i - 1]._operator != '(' and mid[i - 1]._operator != ')')
-					throw exception("Wrong format.");
+					throw exception(logic_error("Wrong format."));
 				if (i + 1 < mid.size() and !mid[i + 1].isOperand and mid[i + 1]._operator != '(' and mid[i + 1]._operator != ')')
-					throw exception("Wrong format.");
+					throw exception(logic_error("Wrong format."));
 			}
 		}
 	}
@@ -99,13 +100,13 @@ void Calculator::__check(std::vector<item>& mid)
 			checkParenthesis.push(i._operator);
 		else if (!i.isOperand and i._operator == ')') {
 			if (checkParenthesis.empty())
-				throw exception("Missing paired parentheses.");
+				throw exception(logic_error("Missing paired parentheses."));
 			else
 				checkParenthesis.pop();
 		}
 	}
 	if (checkParenthesis.size())
-		throw exception("Missing paired parentheses.");
+		throw exception(logic_error("Missing paired parentheses."));
 }
 
 std::vector<item> Calculator::__midToBack(std::vector<item>& mid)
@@ -170,7 +171,7 @@ double Calculator::__calculate(std::vector<item>& back)
 				break;
 			case '/':
 				if (fabs(b) < 0.000001)
-					throw exception("Divide zero.");
+					throw exception(logic_error("Divide zero."));
 				result.push(a / b);
 				break;
 			default:
@@ -179,7 +180,7 @@ double Calculator::__calculate(std::vector<item>& back)
 		}
 	}
 	if (result.size() > 1)
-		throw exception("Wrong format.");
+		throw exception(logic_error("Wrong format."));
 	double ret = result.top();
 	ret = round(ret * 10) / 10.0;
 	return ret;
