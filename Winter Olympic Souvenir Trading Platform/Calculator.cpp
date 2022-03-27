@@ -6,6 +6,7 @@
 #include <ranges>
 #include <sstream>
 #include <iostream>
+#include <exception>
 using namespace std;
 
 
