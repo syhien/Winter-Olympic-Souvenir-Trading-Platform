@@ -28,6 +28,7 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 		if (i.first == "commands")
 			continue;
 		auto tableName = i.first;
+		__table[tableName] = std::vector<std::vector<std::pair<std::string, std::string> > >();
 		auto tablePath = i.second;
 		try
 		{
