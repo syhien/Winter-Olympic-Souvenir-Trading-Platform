@@ -426,8 +426,11 @@ void SellerPage(std::string id)
 			newCommodity.push_back(tmpStrStream.str());
 
 			cout << "Input description:";
-			cin >> tmp;
+			cin.clear();
+			cin.ignore();
+			getline(cin, tmp);
 			tmp = regex_replace(tmp, regex(","), "_");
+			tmp = regex_replace(tmp, regex(" "), "_");
 			if (tmp.length() > 200) {
 				cout << "Too long description" << endl;
 				break;
@@ -442,7 +445,7 @@ void SellerPage(std::string id)
 			cout << "name:" << newCommodity[1] << endl;
 			cout << "price:" << newCommodity[2] << endl;
 			cout << "number:" << newCommodity[3] << endl;
-			cout << "description" << newCommodity[4] << endl << endl;
+			cout << "description:" << newCommodity[4] << endl << endl;
 
 			cout << "Add commodity? Input 1 to add or input others to quit" << endl;
 			if (getOperationCode() == 1)
@@ -549,8 +552,11 @@ void SellerPage(std::string id)
 				break;
 			case 4:
 				cout << "Input new description:";
-				cin >> tmp;
+				cin.clear();
+				cin.ignore();
+				getline(cin, tmp);
 				tmp = regex_replace(tmp, regex(","), "_");
+				tmp = regex_replace(tmp, regex(" "), "_");
 				if (tmp.length() > 200) {
 					cout << "Wrong format" << endl;
 					break;
