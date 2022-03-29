@@ -225,6 +225,7 @@ void Administator::__handleUserPage()
 					break;
 				}
 				__database->perform("UPDATE user SET userState = inactive WHERE userID = " + keyword, "admin", "123456");
+				__database->perform("UPDATE commodity SET state = removed WHERE sellerID = " + keyword, "admin", "123456");
 				cout << "Ban successfully\n";
 			}
 			catch (const std::exception& e)
