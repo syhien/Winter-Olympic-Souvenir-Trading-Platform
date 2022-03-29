@@ -695,7 +695,7 @@ void BuyerPage(std::string id)
 				break;
 			}
 			for (auto& i : allCommodity.front())
-				if (i.first == "unitPrice")
+				if (i.first == "price")
 					price = stod(i.second);
 				else if (i.first == "number")
 					availableCount = stoi(i.second);
@@ -708,9 +708,9 @@ void BuyerPage(std::string id)
 			try
 			{
 				if (count == availableCount)
-					database.perform("UPDATE commodity SET count = 0, state = removed WHERE commodityID = " + commodityID, id, "buyer");
+					database.perform("UPDATE commodity SET number = 0 , state = removed WHERE commodityID = " + commodityID, id, "buyer");
 				else
-					database.perform("UPDATE commodity SET count = " + to_string(availableCount - count) + " WHERE commodityID = " + commodityID, id, "buyer");
+					database.perform("UPDATE commodity SET number = " + to_string(availableCount - count) + " WHERE commodityID = " + commodityID, id, "buyer");
 				allOrder = database.perform("SELECT * FROM order", id, "buyer");
 				for (int i = 1; i < 999; i++) {
 					bool existed = false;
