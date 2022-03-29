@@ -367,12 +367,12 @@ void SellerPage(std::string id)
 			newCommodity.clear();
 			for (int i = 1; i < 999; i++) {
 				bool existed = false;
+				tmpStrStream.clear();
+				tmpStrStream.str("");
+				tmpStrStream << "M";
+				tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 				for (auto& j : allCommodity)
 					for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "commodityID"; })) {
-						tmpStrStream.clear();
-						tmpStrStream.str("");
-						tmpStrStream << "M";
-						tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 						existed = existed or k.second == tmpStrStream.str();
 					}
 				if (!existed) {
@@ -707,12 +707,12 @@ void BuyerPage(std::string id)
 				allOrder = database.perform("SELECT * FROM order", id, "buyer");
 				for (int i = 1; i < 999; i++) {
 					bool existed = false;
+					tmpStrStream.clear();
+					tmpStrStream.str("");
+					tmpStrStream << "T";
+					tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 					for (auto& j : allOrder)
 						for (auto& k : j | views::filter([i](const pair<string, string> l) {return l.first == "orderID"; })) {
-							tmpStrStream.clear();
-							tmpStrStream.str("");
-							tmpStrStream << "T";
-							tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 							existed = existed or k.second == tmpStrStream.str();
 						}
 					if (!existed) {
@@ -874,14 +874,13 @@ void SignUp()
 	stringstream tmpStrStream;
 	for (int i = 1; i < 999; i++) {
 		bool existed = false;
+		tmpStrStream.clear();
+		tmpStrStream.str("");
+		tmpStrStream << "U";
+		tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 		for (auto& j : allUser)
 			for (auto& k : j | views::filter([i](const pair<string, string>& l) {return l.first == "userID"; })) {
-				tmpStrStream.clear();
-				tmpStrStream.str("");
-				tmpStrStream << "U";
-				tmpStrStream << setw(3) << setfill('0') << setiosflags(ios::right) << i;
 				existed = existed or k.second == tmpStrStream.str();
-
 			}
 		if (!existed) {
 			newUser.push_back(tmpStrStream.str());
