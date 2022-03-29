@@ -365,6 +365,7 @@ void SellerPage(std::string id)
 		case 1:
 			command = "INSERT INTO commodity VALUES (";
 			newCommodity.clear();
+			allCommodity = database.perform("SELECT * FROM commodity", "admin", "123456");
 			for (int i = 1; i < 999; i++) {
 				bool existed = false;
 				tmpStrStream.clear();
