@@ -154,13 +154,6 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="terminal.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="commands.txt" />
-    <Text Include="commodity.txt" />
-    <Text Include="order.txt" />
-    <Text Include="recharge.txt" />
-    <Text Include="user.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

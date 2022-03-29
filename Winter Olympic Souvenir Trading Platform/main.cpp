@@ -729,6 +729,7 @@ void BuyerPage(std::string id)
 				}
 				database.perform("INSERT INTO order VALUES (" + newOrderID + "," + commodityID + "," + to_string(price) + "," + to_string(count) + "," + getCurrentTime() + "," + sellerID + "," + id + ")", id, "buyer");
 				database.perform("UPDATE user SET balance = " + calculateWallet(id) + " WHERE userID = " + id, id, "buyer");
+				cout << "Buy successfully!" << endl;
 			}
 			catch (const std::exception&)
 			{
