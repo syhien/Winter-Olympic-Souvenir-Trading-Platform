@@ -214,7 +214,10 @@ std::vector<std::vector<std::pair<std::string, std::string>>> Database::__update
 			throw exception(logic_error("Wrong command format."));
 		}
 		stream >> updateValue;
-		stream >> assertChar;
+		if (updateValue.back() != ',')
+			stream >> assertChar;
+		else
+			assertChar = updateValue.back(), updateValue.pop_back();
 		if (assertChar != ',' and assertChar != 'W') {
 			throw exception(logic_error("Wrong command format."));
 		}
