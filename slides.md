@@ -48,6 +48,8 @@ master分支用于开发，release用于发布较可靠版本
 
 database和calculator分支专用于数据库和计算器开发
 
+nochinese分支专用于无中文版本
+
 *没有dev分支*
 
 ---
@@ -64,13 +66,75 @@ database和calculator分支专用于数据库和计算器开发
 
 1. `WelcomePage()`未以任何身份登录
 
+该页面会引导用户选择身份（买家、卖家）或管理用户信息
+
+---
+
+# 模块设计
+
+## `main()`
+
+`main.cpp`内将不同角色的相关操作抽象成了若干小方法：
+
 2. `AdministatorPage()`管理员登录，进行管理员身份验证，验证通过调用`Administator::HomePage()`进入管理员面板
+
+该页面引导输入管理员账号及密码，验证通过调用`Administator::HomePage()`进入管理员面板
+
+
+---
+
+# 模块设计
+
+## `main()`
+
+`main.cpp`内将不同角色的相关操作抽象成了若干小方法：
 
 3. `InfoManagePage()`用户管理个人信息
 
+> 1.Check profile                2.Edit profile                    3.Recharge                      4.Return
+
+支持查看个人信息、修改个人信息、充值个人账户余额
+
+
+---
+
+# 模块设计
+
+## `main()`
+
+`main.cpp`内将不同角色的相关操作抽象成了若干小方法：
+
+3. `InfoManagePage()`用户管理个人信息
+
+**Feature**：考虑到用户修改密码的需求是实际存在的、必需的，加入了密码修改功能
+
+---
+
+# 模块设计
+
+## `main()`
+
+`main.cpp`内将不同角色的相关操作抽象成了若干小方法：
+
 4. `SellerPage()`和`BuyerPage()`卖家和买家的交互程序
 
-5. ...
+买家和卖家的各个操作被单独实现
+
+**Feature**：买家和卖家在搜索订单、商品时均支持全关键字搜索，不止可以搜索名称更可直接搜索某记录的ID、用户ID
+
+---
+
+# 模块设计
+
+## `main()`
+
+`main.cpp`内将不同角色的相关操作抽象成了若干小方法：
+
+5. `BlacklistManagePage()`黑名单管理 **Feature**
+
+> 1.Check blacklist               2.Add blacklist                      3.Return
+
+在黑名单页面可以查看已拉黑的用户，可以添加黑名单，也可以返回上级菜单
 
 ---
 
@@ -166,7 +230,7 @@ void __handleUserPage();
 
 - 暴露一个方法以供所有类型的命令使用
 
-- 自带基础的权限检查
+- 根据用户的身份对查询结果进行过滤
 
 ---
 
