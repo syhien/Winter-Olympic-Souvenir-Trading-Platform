@@ -6,7 +6,7 @@
 class Database
 {
 public:
-	Database(std::vector<std::pair<std::string, std::string> > inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"},{"recharge","recharge.txt"},{"commands","commands.txt"}
+	Database(std::vector<std::pair<std::string, std::string> > inputFiles = { {"commodity","commodity.txt"},{"order","order.txt"},{"user","user.txt"},{"recharge","recharge.txt"},{"commands","commands.txt"},{"blacklist","blacklist.txt"}
 		});
 	std::vector<std::vector<std::pair<std::string, std::string> > > perform(std::string command, std::string sender, std::string mode);
 	~Database();

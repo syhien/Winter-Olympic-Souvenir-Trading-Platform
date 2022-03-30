@@ -24,6 +24,7 @@ Database::Database(std::vector<std::pair<std::string, std::string>> inputFiles)
 	__columnOfTable["order"] = { "orderID","commodityID","unitPrice","number","date","sellerID","buyerID" };
 	__columnOfTable["user"] = { "userID","username","password","phoneNumber","address","balance","userState" };
 	__columnOfTable["recharge"] = { "userID","money","date" };
+	__columnOfTable["blacklist"] = { "userID","bannedID","date" };
 	for (auto& i : inputFiles) {
 		if (i.first == "commands")
 			continue;
@@ -264,7 +265,7 @@ void Database::__saveCommand(std::string command)
 
 void Database::__save()
 {
-	map<string, string> tableTitle = { {"commodity","commodityID,commodityName,price,number,description,sellerID,addedDate,state"},{"order","orderID,commodityID,unitPrice,number,date,sellerID,buyerID"},{"user","userID,username,password,phoneNumber,address,balance,userState"},{"recharge","userID,money,rechargeDate"} };
+	map<string, string> tableTitle = { {"commodity","commodityID,commodityName,price,number,description,sellerID,addedDate,state"},{"order","orderID,commodityID,unitPrice,number,date,sellerID,buyerID"},{"user","userID,username,password,phoneNumber,address,balance,userState"},{"recharge","userID,money,rechargeDate"},{"blacklist","userID,bannedId,date"} };
 	for (auto& i : __tableFiles) {
 		if (i.first == "commands")
 			continue;
