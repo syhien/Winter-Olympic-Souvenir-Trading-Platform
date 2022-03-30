@@ -116,7 +116,7 @@ void LogIn()
 		id = i.second;
 	while (keepHere)
 	{
-		cout << setw(30) << "1.I am Buyer" << setw(30) << "2.I am Seller" << setw(30) << "3.Manage profile" << setw(30) << "4.Return" << endl;
+		cout << setw(30) << "1.I am Buyer" << setw(30) << "2.I am Seller" << setw(30) << "3.Manage profile" << setw(30) << "4.Manage blacklist" << setw(30) << "5.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -129,6 +129,69 @@ void LogIn()
 			InfoManagePage(userInfo);
 			break;
 		case 4:
+			BlacklistManagePage(userInfo);
+			break;
+		case 5:
+			keepHere = false;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void BlacklistManagePage(std::vector<std::pair<std::string, std::string>>& userInfo)
+{
+	bool keepHere = true;
+	string userID;
+	for (auto& i : userInfo | views::filter([](const pair<string, string> j) {return j.first == "userID"; }))
+		userID = i.second;
+	auto allBlacklist = database.perform("SELECT * FROM blacklist", userID, "user");
+	auto allUser = database.perform("SELECT * FROM user", "admin", "123456");
+	string bannedUserID;
+	while (keepHere)
+	{
+		cout << setw(30) << "1.Check blacklist" << setw(30) << "2.Add blacklist" << setw(30) << "3.Return" << endl;
+		switch (getOperationCode())
+		{
+		case 1:
+			allBlacklist = database.perform("SELECT * FROM blacklist", userID, "user");
+			cout << setw(30) << "bannedUserID" << setw(30) << "date" << endl;
+			for (auto& i : allBlacklist) {
+				for (auto& j : i)
+					if (j.first != "userID")
+						cout << setw(30) << j.second;
+				cout << endl;
+			}
+			break;
+		case 2:
+			cout << "Input the userID that should be added into blacklist:";
+			cin >> bannedUserID;
+			allUser = database.perform("SELECT * FROM user", "admin", "123456");
+			allUser.erase(remove_if(allUser.begin(), allUser.end(), [bannedUserID](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.first == "userID") return j.second != bannedUserID; } return false; }), allUser.end());
+			if (allUser.empty() or bannedUserID == userID) {
+				cout << "User not found or unable to add into blacklist" << endl;
+				break;
+			}
+			cout << "Check the informations" << endl;
+			cout << "userID:" + allUser.front()[0].second << endl;
+			cout << "username:" + allUser.front()[1].second << endl;
+			cout << "Input 1 to add him or her into your blacklist or input others to quit" << endl;
+			if (getOperationCode() != 1) {
+				cout << "quit" << endl;
+				break;
+			}
+			try
+			{
+				database.perform("INSERT INTO blacklist VALUES (" + userID + "," + bannedUserID + "," + getCurrentTime() + ")", userID, "user");
+				cout << "add successfully" << endl;
+			}
+			catch (const std::exception&)
+			{
+				cout << "1gnore 0peration" << endl;
+			}
+			break;
+		case 3:
 			keepHere = false;
 			break;
 		default:

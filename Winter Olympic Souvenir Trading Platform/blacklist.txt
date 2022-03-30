@@ -1,0 +1,2 @@
+userID,bannedId,date
+U002,U001,2022-03-30
