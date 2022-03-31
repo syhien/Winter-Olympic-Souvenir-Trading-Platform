@@ -2,3 +2,5 @@ commodityID,commodityName,price,number,description,sellerID,addedDate,state
 M001,testCom1,9.9,0,just_4_test,U001,2022-03-29,removed
 M002,testComNotSale,9999.0,9,test_and_not_for_sale_already,U001,2022-03-29,removed
 M003,seeThenNotSeen,5476.0,2,test_if_banned_,U001,2022-03-29,removed
+M004,seeORunseen,987.0,3,hhh_hh,U003,2022-03-31,onSale
+M005,blCantSee,47369.2,9,you_cant_buy_it,U002,2022-03-31,onSale

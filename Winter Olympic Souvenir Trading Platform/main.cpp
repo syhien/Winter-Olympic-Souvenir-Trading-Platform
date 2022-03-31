@@ -721,6 +721,16 @@ void BuyerPage(std::string id)
 	string keyword;
 	vector<string> titles;
 	stringstream tmpStrStream;
+	vector<string> unseenUsers;
+	auto allBl = database.perform("SELECT * FROM blacklist", "admin", "123456");
+	for (auto& i : allBl) {
+		if (i[0].second == id) {
+			unseenUsers.push_back(i[1].second);
+		}
+		if (i[1].second == id) {
+			unseenUsers.push_back(i[0].second);
+		}
+	}
 	while (keepHere)
 	{
 		cout << setw(30) << "1.View commoditys" << setw(30) << "2.Buy commodity" << setw(30) << "3.Search" << setw(30) << "4.View orders" << setw(30) << "5.View details of commodity" << setw(30) << "6.Return" << endl;
@@ -728,6 +738,7 @@ void BuyerPage(std::string id)
 		{
 		case 1:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [unseenUsers](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.first == "sellerID") return find(unseenUsers.begin(), unseenUsers.end(), j.second) != unseenUsers.end(); } return true; }), allCommodity.end());
 			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "sellerID" << setw(30) << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
@@ -801,6 +812,7 @@ void BuyerPage(std::string id)
 			break;
 		case 3:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [unseenUsers](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.first == "sellerID") return find(unseenUsers.begin(), unseenUsers.end(), j.second) != unseenUsers.end(); } return true; }), allCommodity.end());
 			cout << "Input keyword:";
 			cin >> keyword;
 			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "price" << setw(30) << "number" << setw(30) << "sellerID" << setw(30) << "addedDate" << endl;
@@ -828,6 +840,7 @@ void BuyerPage(std::string id)
 			break;
 		case 5:
 			allCommodity = database.perform("SELECT * FROM commodity WHERE state CONTAINS onSale", id, "buyer");
+			allCommodity.erase(remove_if(allCommodity.begin(), allCommodity.end(), [unseenUsers](const vector<pair<string, string> >& i) {for (auto& j : i) { if (j.first == "sellerID") return find(unseenUsers.begin(), unseenUsers.end(), j.second) != unseenUsers.end(); } return true; }), allCommodity.end());
 			cout << setw(30) << "commodityID" << setw(30) << "name" << setw(30) << "unitPrice" << setw(30) << "number" << setw(30) << "sellerID" << "addedDate" << endl;
 			for (auto& line : allCommodity)
 			{
