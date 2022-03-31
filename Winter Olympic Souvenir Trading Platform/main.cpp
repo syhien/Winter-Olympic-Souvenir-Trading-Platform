@@ -715,7 +715,7 @@ void BuyerPage(std::string id)
 	string commodityID;
 	int count;
 	int availableCount;
-	double price;
+	string price;
 	string newOrderID;
 	string sellerID;
 	string keyword;
@@ -733,7 +733,7 @@ void BuyerPage(std::string id)
 	}
 	while (keepHere)
 	{
-		cout << setw(30) << "1.View commoditys" << setw(30) << "2.Buy commodity" << setw(30) << "3.Search" << setw(30) << "4.View orders" << setw(30) << "5.View details of commodity" << setw(30) << "6.Return" << endl;
+		cout << setw(30) << "1.View commodity" << setw(30) << "2.Buy commodity" << setw(30) << "3.Search" << setw(30) << "4.View orders" << setw(30) << "5.View details of commodity" << setw(30) << "6.Return" << endl;
 		switch (getOperationCode())
 		{
 		case 1:
@@ -770,12 +770,12 @@ void BuyerPage(std::string id)
 			}
 			for (auto& i : allCommodity.front())
 				if (i.first == "price")
-					price = stod(i.second);
+					price = i.second;
 				else if (i.first == "number")
 					availableCount = stoi(i.second);
 				else if (i.first == "sellerID")
 					sellerID = i.second;
-			if (stod(calculateWallet(id)) < price * count) {
+			if (stod(calculateWallet(id)) < stod(price) * count) {
 				cout << "No enough balance" << endl;
 				break;
 			}
@@ -801,7 +801,7 @@ void BuyerPage(std::string id)
 						break;
 					}
 				}
-				database.perform("INSERT INTO order VALUES (" + newOrderID + "," + commodityID + "," + to_string(price) + "," + to_string(count) + "," + getCurrentTime() + "," + sellerID + "," + id + ")", id, "buyer");
+				database.perform("INSERT INTO order VALUES (" + newOrderID + "," + commodityID + "," + price + "," + to_string(count) + "," + getCurrentTime() + "," + sellerID + "," + id + ")", id, "buyer");
 				database.perform("UPDATE user SET balance = " + calculateWallet(id) + " WHERE userID = " + id, id, "buyer");
 				cout << "Buy successfully!" << endl;
 			}

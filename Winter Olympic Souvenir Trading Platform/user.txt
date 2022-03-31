@@ -1,5 +1,6 @@
 userID,username,password,phoneNumber,address,balance,userState
-U001,test1,1,11111111111,home1,9.9,inactive
+U001,test1,1,11111111111,home1,9.9,active
 U002,testBuyer,buyer,22222222222,home2,9990.1,active
 U003,testBl,bl,43125,24,0.0,active
 U004,test2,2,39,4,0.0,active
+U005,guide,123456789,17776690339,nju,0.0,active
